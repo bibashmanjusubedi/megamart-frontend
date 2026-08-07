@@ -10,24 +10,26 @@ export const HomePage: React.FC = () => {
   const categories = useAppSelector((state) => state.products.categories);
 
   return (
-    <div>
+    <div className="min-vh-100 d-flex flex-column bg-white">
       {/* 1. Header Navbar */}
       <Header />
 
       {/* 2. Key Category Navigation */}
       <CategoryNav />
 
-      <main>
+      <main className="container flex-grow-1">
         {/* Section A: Smartphone Deals */}
-        <section>
-          <div>
-            <h5>Grab the best deal on Smartphones</h5>
-            <a href="products?category=1">View All</a>
+        <section className="mb-5">
+          <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+            <h5 className="fw-bold text-dark m-0">Grab the best deal on Smartphones</h5>
+            <a href="products?category=1" className="text-primary text-decoration-none fw-semibold small">
+              View All <i className="bi bi-chevron-right"></i>
+            </a>
           </div>
 
-          <div>
+          <div className="row row-cols-1  row-cols-sm-2 row-cols-md-4 g-3">
             {products.slice(0, 4).map((product) => (
-              <div key={product.id}>
+              <div key={product.id} className="col">
                 <ProductCard product={product} />
               </div>
             ))}
@@ -35,39 +37,45 @@ export const HomePage: React.FC = () => {
         </section>
 
         {/* Section B: Shop From Top Categories */}
-        <section>
-          <div>
-            <h5>Shop From Top Categories</h5>
-            <a href="/products">View All</a>
+        <section className="mb-5">
+          <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+            <h5 className="fw-bold text-dark m-0">Shop From Top Categories</h5>
+            <a href="/products" className="text-primary text-decoration-none fw-semibold small">
+              View All <i className="bi bi-chevron-right"></i>
+            </a>
           </div>
 
-          <div>
+          <div className="d-flex align-items-center justify-content-between text-center overflow-auto py-2">
             {categories.map((category) => (
               <div
                 key={category.id}
+                className="d-flex flex-column align-items-center"
+                style={{ minWidth:'90px'}}
               >
                 <div
+                  className="rounded-circle bg-light border d-flex align-items-center justify-content-center shadow-sm mb-2"
+                  style={{ width: '70px', height:'70px'}}
                 >
-                  <i></i>
+                  <i className="bi bi-shop fs-3 text-primary"></i>
                 </div>
-                <span>{category.name}</span>
+                <span className="small fw-semibold text-dark">{category.name}</span>
               </div>
             ))}
           </div>
         </section>
 
         {/* Section C: Daily Essentials */}
-        <section>
-          <div>
-            <h5>Daily Essentials</h5>
-            <a href="/products?category=groceries">
-              View All <i></i>
+        <section className="mb-5">
+          <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+            <h5 className="fw-bold text-dark m-0">Daily Essentials</h5>
+            <a href="/products?category=groceries" className="text-primary text-decoration-none fw-semibold small">
+              View All <i className="bi bi-chevron-right"></i>
             </a>
           </div>
 
-          <div>
+          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
             {products.slice(0, 4).map((product) => (
-              <div>
+              <div key={`daily-${product.id}`} className="col">
                 <ProductCard product={product} />
               </div>
             ))}
