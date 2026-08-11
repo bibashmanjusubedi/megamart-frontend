@@ -5,9 +5,16 @@
 // import './App.css'
 import { HomePage } from './pages/HomePage';
 import React from 'react';
-
+import { BrowserRouter,Routes,Route} from 'react-router-dom';
+ 
 const App: React.FC = () =>{
-  return <HomePage />
+  return (
+    // <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />}/>
+      </Routes>
+    // </BrowserRouter>
+  );
 }
 
 export default App;
