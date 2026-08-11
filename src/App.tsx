@@ -4,6 +4,7 @@
 // import heroImg from './assets/hero.png'
 // import './App.css'
 import { HomePage } from './pages/HomePage';
+import { ProductListingPage } from './pages/ProductListingPage';
 import React from 'react';
 import { BrowserRouter,Routes,Route} from 'react-router-dom';
  
@@ -12,6 +13,7 @@ const App: React.FC = () =>{
     // <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />}/>
+        <Route path="/products" element={<ProductListingPage />}/>
       </Routes>
     // </BrowserRouter>
   );
