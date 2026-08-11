@@ -34,4 +34,14 @@ export const mockProducts: Product[] = [
     imageURL: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80',
     imagePublicId: 'sample3',
   },
+
+   {
+    id: 104,
+    categoryId: 1,
+    name: 'iPhone',
+    price: 100000,
+    stockQuantity: 40,
+    imageURL: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80',
+    imagePublicId: 'sample3',
+  },
 ];
