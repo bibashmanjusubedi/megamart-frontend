@@ -56,17 +56,18 @@ export const ProductListingPage: React.FC = () => {
   });
 
   return (
-    <div>
+    <div className="min-vh-100 d-flex flex-column bg-white">
       <Header />
       <CategoryNav />
-      <main>
-        <nav>
-          <ol>
-            <li>
-              <a href="/">Home</a>
+      <main className="container flex-grow-1 py-3">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="breadcrumb" className="mb-3">
+          <ol className="breadcrumb small text-muted">
+            <li className="breadcrumb-item">
+              <a href="/" className="text-decoration-none text-muted">Home</a>
             </li>
-            <li>Category</li>
-            <li>
+            <li className="breadcrumb-item">Category</li>
+            <li className="breadcrumb-item active text-dark fw-semibold" aria-current="page">
               {selectedCategoryId
                 ? categories.find((c) => c.id === selectedCategoryId)?.name
                 : "All Products"}
@@ -74,33 +75,35 @@ export const ProductListingPage: React.FC = () => {
           </ol>
         </nav>
 
-        <div>
+        <div className="row g-4">
             {/* Sidebar Filters */}
-            <aside>
-                <div>
-                    <h6>
+            <aside className="col-12 col-md-3">
+                <div className="border rounded p-3 bg-light">
+                    <h6 className="fw-bold text-uppercase border-bottom pb-2 mb-3">
                         Filters
                     </h6>
 
                     {/* Category Filter */}
-                    <div>
-                        <p>
+                    <div className="mb-4">
+                        <p className="fw-semibold mb-2 small text-uppercase">
                             Categories
                         </p>
-                        <div>
+                        <div className="form-check mb-1">
                             <input
+                                className="form-check-input"
                                 type="radio"
                                 name="categorySelect"
                                 id="cat-all"
                                 checked={selectedCategoryId === null}
                                 onChange={() => dispatch(setSelectedCategory(null))}
                             />
-                            <label htmlFor="cat-all">
+                            <label className="form-check-label small" htmlFor="cat-all">
                                 All Categories
                             </label> 
                             {categories.map((category) => (
                                 <div key={category.id}>
                                     <input
+                                        className="form-check-input"
                                         type="radio"
                                         name="categorySelect"
                                         id = {`cat-${category.id}`}
@@ -108,7 +111,8 @@ export const ProductListingPage: React.FC = () => {
                                         onChange = { () => dispatch(setSelectedCategory(category.id))}
                                     />
                                     <label
-                                        htmlFor = {`cat-${category.id}`}           
+                                      className="form-check-label small"
+                                      htmlFor = {`cat-${category.id}`}           
                                     >
                                         {category.name}
                                     </label>
@@ -117,12 +121,13 @@ export const ProductListingPage: React.FC = () => {
                         </div>
 
                         {/* Price Range Filter */}
-                        <div>
-                            <p>
+                        <div className="mb-4">
+                            <p className="fw-semibold mb-2 small text-uppercase">
                                 Price Range
                             </p>
-                            <div>
+                            <div className="d-flex align-items-center gap-2 mb-2">
                                 <input
+                                    className="form-control form-control-sm"
                                     type="number"
                                     placeholder = "Min"
                                     value={minPrice}
@@ -131,6 +136,7 @@ export const ProductListingPage: React.FC = () => {
 
                                 <span>-</span>
                                 <input
+                                    className="form-control form-control-sm"
                                     type="number"
                                     placeholder="Max"
                                     value={maxPrice}
@@ -140,27 +146,30 @@ export const ProductListingPage: React.FC = () => {
                         </div>
 
                         {/* Availability Filter */}
-                        <div>
-                          <p>
+                        <div className="mb-2">
+                          <p className="fw-semibold mb-2 small ">
                             Availability
                           </p>
 
-                          <div>
+                          <div className="form-check mb-1">
                             <input
+                              className="form-check-input"
                               type = "radio"
                               name = "stockFilter"
                               id = "inStock"
                               checked = {inStockOnly}
-                              onChange = {() => setInStockOnly(true)}                            >
-                            </input>
+                              onChange = {() => setInStockOnly(true)}
+                            />                            
+                            
 
-                            <label htmlFor="inStock">
+                            <label  className="form-check-label" htmlFor="inStock">
                               In Stock Only
                             </label>
                           </div>
 
-                          <div>
+                          <div className="form-check">
                             <input
+                              className="form-check-input"
                               type="radio"
                               name="stockFilter"
                               id="allStock"
@@ -168,7 +177,7 @@ export const ProductListingPage: React.FC = () => {
                               onChange = {() => setInStockOnly(false)}
                             />
 
-                            <label htmlFor="allStock">
+                            <label className="form-check-label" htmlFor="allStock">
                               Include out of stock
                             </label>
                           </div>
@@ -178,24 +187,25 @@ export const ProductListingPage: React.FC = () => {
             </aside>
 
             {/* Catalog Listing Area */}
-            <section>
+            <section className="col-12 col-md-9">
               {/* Catalog Header & Sorting */}
-              <div>
-                <h6>
+              <div className="d-flex flex-wrap align-items-center justify-content-between border-bottom pb-2 mb-3 gap-2">
+                <h6 className="m-0 fw-bold">
                   {selectedCategoryId
                   ? categories.find((c) => c.id === selectedCategoryId)?.name
                   : 'All Products'}{' '}
-                  <span>
+                  <span className="text-muted fw-normal fs-7">
                     (Showing 1-{sortedProducts.length} of {sortedProducts.length} items)
                   </span>
                 </h6>
 
-                <div>
-                  <label>
+                <div className="d-flex align-items-center gap-2">
+                  <label className="small fw-semibold text-nowrap">
                     Sort By:
                   </label>
 
                   <select
+                    className="form-select form-select-sm"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
@@ -208,46 +218,46 @@ export const ProductListingPage: React.FC = () => {
 
               {/* Product Grid */}
               {sortedProducts.length > 0 ? (
-                <div>
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
                   {sortedProducts.map((product) => (
-                    <div key={product.id}>
+                    <div key={product.id} className="col">
                       <ProductCard product={product} />
                     </div>
                   ))}
                 </div>
               ) : (
-                <div>
-                  <p>
+                <div className="text-center py-5 border rounded bg-light my-3">
+                  <p className="text-muted mb-0">
                     No products found matching your search or filters.
                   </p>
                 </div>
               )}
 
               {/* Pagination Controls */}
-              <nav>
-                <ul>
-                  <li>
-                    <span>Previous</span>
+              <nav aria-label="Catalog Page Navigation" className="d-flex justify-content-center mt-4">
+                <ul className="pagination pagination-sm mb-0">
+                  <li className="page=item disabled">
+                    <span className="page-link">Previous</span>
                   </li>
 
-                  <li>
-                    <span>1</span>
+                  <li className="page-item active">
+                    <span className="page-link">1</span>
                   </li>
 
-                  <li>
-                    <a href="#">
+                  <li className="page-item">
+                    <a className="page-link" href="#">
                       2
                     </a>
                   </li>
 
-                  <li>
-                    <a href="#">
+                  <li className="page-item">
+                    <a className="page-link" href="#">
                       3
                     </a>
                   </li>
 
-                  <li>
-                    <a href="#">
+                  <li className="page-item">
+                    <a className="page-link" href="#">
                       Next
                     </a>
                   </li>
@@ -256,7 +266,7 @@ export const ProductListingPage: React.FC = () => {
             </section>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
