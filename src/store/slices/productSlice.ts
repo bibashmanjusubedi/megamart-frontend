@@ -7,14 +7,14 @@ import { mockCategories } from '../../mock/mockData';
 interface ProductState {
     products: Product[];
     searchQuery: string;
-    categories: Category[];
+    // categories: Category[];
     selectedCategoryId: number | null;
 }
 
 const initialState: ProductState = {
     products: mockProducts,
     searchQuery: '',
-    categories: mockCategories,
+    // categories: mockCategories,
     selectedCategoryId: null,
 };
 

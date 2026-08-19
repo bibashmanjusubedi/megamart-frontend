@@ -20,24 +20,43 @@ export const ProductListingPage: React.FC = () => {
   const [inStockOnly, setInStockOnly] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<string>("featured");
 
+
+  // Cleaned Filter logic with strict numeric conversions
+  const minNum = minPrice.trim() !== ""? Number(minPrice) : null;
+  const maxNum = maxPrice.trim() !== ""? Number(maxPrice) : null;
+  const query = (searchQuery ||  "").trim().toLowerCase();
+
+
   // Filter logic
   const filteredProducts = products.filter((product) => {
     // Search Query
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    // const matchesSearch = product.name
+    //   .toLowerCase()
+    //   .includes(searchQuery.toLowerCase());
+
+    const matchesSearch = 
+      query === ""
+      ? true
+      : product.name.toLowerCase().includes(query);
 
     // Category Filter
-    const matchesCategory = selectedCategoryId
-      ? product.categoryId === selectedCategoryId
-      : true;
+    // const matchesCategory = selectedCategoryId
+    //   ? product.categoryId === selectedCategoryId
+    //   : true;
+    const matchesCategory =  
+      selectedCategoryId !== null  && selectedCategoryId !==undefined
+      ? Number(product.categoryId) === Number(selectedCategoryId)
+      :true;
 
     // Price Filter
-    const matchesMinPrice = minPrice ? product.price >= Number(minPrice) : true;
-    const matchesMaxPrice = maxPrice ? product.price >= Number(maxPrice) : true;
+    const currentPrice = Number(product.price);
+    const matchesMinPrice = minNum !== null ? currentPrice >= minNum: true;
+    const matchesMaxPrice = maxNum !== null ? currentPrice <= maxNum: true;
+    // const matchesMinPrice = minPrice ? product.price >= Number(minPrice) : true;
+    // const matchesMaxPrice = maxPrice ? product.price >= Number(maxPrice) : true;
 
     // Stock Availability
-    const matchesStock = inStockOnly ? product.stockQuantity > 0 : true;
+    const matchesStock = inStockOnly ? Number(product.stockQuantity) > 0 : true;
 
     return (
       matchesSearch &&
@@ -50,8 +69,8 @@ export const ProductListingPage: React.FC = () => {
 
   // Sorting Logic
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === "price-low") return a.price - b.price;
-    if (sortBy === "price-high") return b.price - a.price;
+    if (sortBy === "price-low") return Number(a.price) - Number(b.price);
+    if (sortBy === "price-high") return Number(b.price) - Number(a.price);
     return 0; // Default/Featured
   });
 

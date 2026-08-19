@@ -7,7 +7,7 @@ import { useAppSelector } from "../store/hooks";
 
 export const HomePage: React.FC = () => {
   const products = useAppSelector((state) => state.products.products);
-  const categories = useAppSelector((state) => state.products.categories);
+  const { categories } = useAppSelector((state) => state.categories);
 
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
@@ -22,7 +22,7 @@ export const HomePage: React.FC = () => {
         <section className="mb-5">
           <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
             <h5 className="fw-bold text-dark m-0">Grab the best deal on Smartphones</h5>
-            <a href="products?category=1" className="text-primary text-decoration-none fw-semibold small">
+            <a href="/products?category=1" className="text-primary text-decoration-none fw-semibold small">
               View All <i className="bi bi-chevron-right"></i>
             </a>
           </div>

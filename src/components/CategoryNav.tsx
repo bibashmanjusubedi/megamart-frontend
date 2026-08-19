@@ -6,7 +6,8 @@ export const CategoryNav: React.FC = () => {
     const dispatch = useAppDispatch();
     // const { categories } = useAppSelector((state) => state.categories);
     // const { selectedCategoryId } = useAppSelector((state) => state.products);
-    const { categories,selectedCategoryId } = useAppSelector((state) => state.products);
+    const { categories } = useAppSelector((state) => state.categories);
+    const { selectedCategoryId } = useAppSelector((state) => state.products);
 
     return (
         <nav className="bg-light border-bottom py-2 mb-4">
