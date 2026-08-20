@@ -7,6 +7,11 @@ export interface Category{
     name: string;
 }
 
+export interface ProductImageItem{
+    imageURL: string;
+    imagePublicId:string;
+}
+
 export interface Product{
     id: number;
     categoryId: number;// FK -> Category.id
@@ -15,6 +20,7 @@ export interface Product{
     stockQuantity: number;
     imageURL: string;
     imagePublicId?: string;
+    secondaryImages?: ProductImageItem[];
 }
 
 
