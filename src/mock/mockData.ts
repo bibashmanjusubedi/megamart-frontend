@@ -29,6 +29,12 @@ export const mockProducts: Product[] = [
         imagePublicId: "sample1_sec3",
       },
     ],
+    description: "High-performance flagship device engineered with premium build materials, pro-grade optics, and long battery endurance for demanding workloads.",
+    specifications: {
+      model: "Galaxy S22 Ultra",
+      warranty: "1 Year Comprehensive Brand Warranty",
+      delivery: "Free Standard Shipping available",
+    },
   },
   {
     id: 102,
@@ -52,6 +58,12 @@ export const mockProducts: Product[] = [
         imagePublicId: "sample2_sec3",
       },
     ],
+    description: "Immerse yourself in pure studio sound with active noise cancellation, ultra-soft memory foam ear cushions, and long-lasting battery life.",
+    specifications: {
+      model: "WH-1000XM Series",
+      warranty: "2 Years Comprehensive Brand Warranty",
+      delivery: "Free Standard Shipping available",
+    },
   },
   {
     id: 103,
@@ -75,6 +87,12 @@ export const mockProducts: Product[] = [
         imagePublicId: "sample3_sec3",
       },
     ],
+    description: "Deeply nourishing facial serum enriched with essential vitamins to restore hydration and enhance natural skin glow.",
+    specifications: {
+      model: "HydraBoost Serum (30ml)",
+      warranty: "100% Authentic Product Guarantee",
+      delivery: "Free Standard Shipping available",
+    },
   },
 
    {
@@ -99,5 +117,11 @@ export const mockProducts: Product[] = [
         imagePublicId: "sample4_sec3",
       },
     ],
+    description: "High-performance flagship device engineered with premium build materials, pro-grade optics, and long battery endurance for demanding workloads.",
+    specifications: {
+      model: "iPhone",
+      warranty: "1 Year Comprehensive Brand Warranty",
+      delivery: "Free Standard Shipping available",
+    },
   },
 ];

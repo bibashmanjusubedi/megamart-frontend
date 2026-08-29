@@ -245,22 +245,20 @@ export const ProductDetailsPage: React.FC = () => {
         <div className="border rounded-3 p-4 bg-light">
           <h5 className="fw-bold border-bottom pb-2 mb-3">Product Description & Specifications</h5>
           <p className="text-secondary leading-relaxed mb-3">
-            High-performance flagship device engineered with premium build
-            materials, pro-grade optics, and long battery endurance for
-            demanding workloads.
+           {product.description}
           </p>
           <ul className="list-unstyled text-muted small mb-0 d-flex flex-column gap-2">
             <li>
-              <strong>Model:</strong> {product.name}
+              <strong>Model:</strong> {product.specifications?.model || product.name}
             </li>
             <li>
-              <strong>Category:</strong> {category?.name || "Smartphones"}
+              <strong>Category:</strong> {category?.name || "General"}
             </li>
             <li>
-              <strong>Warranty:</strong> 1 Year Comprehensive Brand Warranty
+              <strong>Warranty:</strong> {product.specifications?.warranty} 
             </li>
             <li>
-              <strong>Delivery:</strong> Free Standard Shipping available
+              <strong>Delivery:</strong> {product.specifications?.delivery}
             </li>
           </ul>
         </div>

@@ -12,6 +12,12 @@ export interface ProductImageItem{
     imagePublicId:string;
 }
 
+export interface ProductSpecification{
+    model:string;
+    warranty:string;
+    delivery:string;
+}
+
 export interface Product{
     id: number;
     categoryId: number;// FK -> Category.id
@@ -21,6 +27,8 @@ export interface Product{
     imageURL: string;
     imagePublicId?: string;
     secondaryImages?: ProductImageItem[];
+    description:string;
+    specifications:ProductSpecification;
 }
 
 
