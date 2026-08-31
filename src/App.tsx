@@ -6,6 +6,7 @@
 import { HomePage } from './pages/HomePage';
 import { ProductListingPage } from './pages/ProductListingPage';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
+import { CartPage } from './pages/CartPage';
 import React from 'react';
 import { BrowserRouter,Routes,Route} from 'react-router-dom';
  
@@ -16,6 +17,7 @@ const App: React.FC = () =>{
         <Route path="/" element={<HomePage />}/>
         <Route path="/products" element={<ProductListingPage />}/>
         <Route path="products/:id" element={<ProductDetailsPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     // </BrowserRouter>
   );
