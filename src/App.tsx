@@ -8,6 +8,7 @@ import { ProductListingPage } from './pages/ProductListingPage';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { CartPage } from './pages/CartPage';
 import { SignInPage } from './pages/SignInPage';
+import { RegisterPage } from './pages/RegisterPage';
 import React from 'react';
 import { BrowserRouter,Routes,Route} from 'react-router-dom';
  
@@ -22,6 +23,7 @@ const App: React.FC = () =>{
 
         {/* Auth Routes */}
         <Route path="/signin" element={<SignInPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     // </BrowserRouter>
   );
