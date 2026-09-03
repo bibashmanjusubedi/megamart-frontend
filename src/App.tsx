@@ -9,6 +9,7 @@ import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { CartPage } from './pages/CartPage';
 import { SignInPage } from './pages/SignInPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { CustomerOrderHistoryPage } from './pages/CustomerOrderHistoryPage';
 import React from 'react';
 import { BrowserRouter,Routes,Route} from 'react-router-dom';
  
@@ -20,7 +21,7 @@ const App: React.FC = () =>{
         <Route path="/products" element={<ProductListingPage />}/>
         <Route path="products/:id" element={<ProductDetailsPage />} />
         <Route path="/cart" element={<CartPage />} />
-
+        <Route path="/orders" element={<CustomerOrderHistoryPage />} />
         {/* Auth Routes */}
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<RegisterPage />} />
