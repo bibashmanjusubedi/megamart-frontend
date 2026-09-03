@@ -29,9 +29,12 @@ export const productSlice = createSlice({
         setSelectedCategory:(state,action:PayloadAction<number | null>)=>{
             state.selectedCategoryId = action.payload;
         },
+        deleteProduct: (state, action: PayloadAction<number>) => {
+            state.products = state.products.filter((p) => p.id !== action.payload);
+        },
     },
 });
 
 
-export const { setSearchQuery, setSelectedCategory } = productSlice.actions;
+export const { setSearchQuery, setSelectedCategory,deleteProduct } = productSlice.actions;
 export default productSlice.reducer;
