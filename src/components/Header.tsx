@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector,useAppDispatch } from '../store/hooks';
 import { setSearchQuery } from '../store/slices/productSlice';
 
@@ -7,6 +7,15 @@ export const Header:React.FC = () => {
     const dispatch = useAppDispatch();
     const { searchQuery } = useAppSelector((state) => state.products);
     const { isAuthenticated,currentUser } = useAppSelector((state) => state.auth );
+
+    const navigate = useNavigate();
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter'){
+            navigate('/products'); // Jump to the products page on Enter key press
+        }
+    }
+
 
     return(
         <header className="bg-white border-bottom sticky-top py-2 shadow-sm">
@@ -28,6 +37,7 @@ export const Header:React.FC = () => {
                             placeholder="Search essentials,groceries..."
                             value={searchQuery}
                             onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                            onKeyDown={handleKeyDown}
                         />
                     </div>
                 </div>

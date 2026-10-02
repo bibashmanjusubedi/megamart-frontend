@@ -34,10 +34,13 @@ export const ProductListingPage: React.FC = () => {
     //   .toLowerCase()
     //   .includes(searchQuery.toLowerCase());
 
+    const productCategory = categories.find((c) => c.id === product.categoryId);
+    const categoryName = productCategory ? productCategory.name.toLowerCase() : "";
+
     const matchesSearch = 
       query === ""
       ? true
-      : product.name.toLowerCase().includes(query);
+      : product.name.toLowerCase().includes(query) || categoryName.includes(query);
 
     // Category Filter
     // const matchesCategory = selectedCategoryId
@@ -255,7 +258,7 @@ export const ProductListingPage: React.FC = () => {
               {/* Pagination Controls */}
               <nav aria-label="Catalog Page Navigation" className="d-flex justify-content-center mt-4">
                 <ul className="pagination pagination-sm mb-0">
-                  <li className="page=item disabled">
+                  <li className="page-item disabled">
                     <span className="page-link">Previous</span>
                   </li>
 
