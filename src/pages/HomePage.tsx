@@ -5,10 +5,13 @@ import { ProductCard } from "../components/ProductCard";
 import { Footer } from "../components/Footer";
 import { useAppSelector } from "../store/hooks";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const HomePage: React.FC = () => {
   const products = useAppSelector((state) => state.products.products);
   const { categories } = useAppSelector((state) => state.categories);
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
@@ -30,7 +33,7 @@ export const HomePage: React.FC = () => {
 
           <div className="row row-cols-1  row-cols-sm-2 row-cols-md-4 g-3">
             {products.slice(0, 4).map((product) => (
-              <div key={product.id} className="col">
+              <div key={product.id} className="col" style = {{ cursor:"pointer"}} onClick={() => navigate(`/products/${product.id}`)}>
                 <ProductCard product={product} />
               </div>
             ))}
@@ -77,7 +80,7 @@ export const HomePage: React.FC = () => {
 
           <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
             {products.slice(0, 4).map((product) => (
-              <div key={`daily-${product.id}`} className="col">
+              <div key={`daily-${product.id}`} className="col" style={{ cursor: "pointer" }} onClick={() => navigate(`/products/${product.id}`)}>
                 <ProductCard product={product} />
               </div>
             ))}
