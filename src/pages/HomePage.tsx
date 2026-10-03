@@ -50,7 +50,7 @@ export const HomePage: React.FC = () => {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                className="d-flex flex-column align-items-center"
+                className="d-flex flex-column align-items-center text-decoration-none"
                 style={{ minWidth:'90px'}}
                 to={`/products?category=${category.id}`}
               >
