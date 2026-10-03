@@ -6,6 +6,7 @@ import { ProductCard } from "../components/ProductCard";
 import { Footer } from "../components/Footer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setSelectedCategory } from "../store/slices/productSlice";
+import { useNavigate } from "react-router-dom";
 
 export const ProductListingPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -13,6 +14,8 @@ export const ProductListingPage: React.FC = () => {
     (state) => state.products,
   );
   const { categories } = useAppSelector((state) => state.categories);
+
+  const navigate = useNavigate();
 
   // Local filter states
   const [minPrice, setMinPrice] = useState<string>("");
@@ -46,7 +49,7 @@ export const ProductListingPage: React.FC = () => {
     // const matchesCategory = selectedCategoryId
     //   ? product.categoryId === selectedCategoryId
     //   : true;
-    const matchesCategory =  
+    const matchesCategory =
       selectedCategoryId !== null  && selectedCategoryId !==undefined
       ? Number(product.categoryId) === Number(selectedCategoryId)
       :true;
@@ -242,7 +245,7 @@ export const ProductListingPage: React.FC = () => {
               {sortedProducts.length > 0 ? (
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
                   {sortedProducts.map((product) => (
-                    <div key={product.id} className="col">
+                    <div key={product.id} className="col" style = {{ cursor:"pointer"}} onClick={() => navigate(`/products/${product.id}`)}>
                       <ProductCard product={product} />
                     </div>
                   ))}
