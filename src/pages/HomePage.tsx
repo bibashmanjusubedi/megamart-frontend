@@ -4,6 +4,7 @@ import { CategoryNav } from "../components/CategoryNav";
 import { ProductCard } from "../components/ProductCard";
 import { Footer } from "../components/Footer";
 import { useAppSelector } from "../store/hooks";
+import { Link } from "react-router-dom";
 
 export const HomePage: React.FC = () => {
   const products = useAppSelector((state) => state.products.products);
@@ -47,10 +48,11 @@ export const HomePage: React.FC = () => {
 
           <div className="d-flex align-items-center justify-content-between text-center overflow-auto py-2">
             {categories.map((category) => (
-              <div
+              <Link
                 key={category.id}
                 className="d-flex flex-column align-items-center"
                 style={{ minWidth:'90px'}}
+                to={`/products?category=${category.id}`}
               >
                 <div
                   className="rounded-circle bg-light border d-flex align-items-center justify-content-center shadow-sm mb-2"
@@ -59,7 +61,7 @@ export const HomePage: React.FC = () => {
                   <i className="bi bi-shop fs-3 text-primary"></i>
                 </div>
                 <span className="small fw-semibold text-dark">{category.name}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
