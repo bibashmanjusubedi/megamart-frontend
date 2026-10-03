@@ -48,7 +48,7 @@ export const Header:React.FC = () => {
                             <i className="bi bi-person-circle fs-5 me-1"></i>{currentUser?.email}
                         </Link>
                     ):(
-                        <Link to="/login" className="btn btn-outline-primary fw-semibold rounded-pill px-3">
+                        <Link to="/signin" className="btn btn-outline-primary fw-semibold rounded-pill px-3">
                             <i></i>Sign In/Up
                         </Link>
                     )}
