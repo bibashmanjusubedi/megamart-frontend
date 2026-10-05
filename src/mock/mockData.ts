@@ -76,7 +76,7 @@ export const mockProducts: Product[] = [
     secondaryImages: [
       {
         // imageURL: "https://images.unsplash.com/photo-1608248597359-00109673898f?w=500&q=80",
-        imageURL: "https://images.unsplash.com/photo-1643747394944-89b11e7fb616",
+        imageURL: "https://images.unsplash.com/photo-1643747394944-89b11e7fb616?w=500&q=80",
         imagePublicId: "sample3_sec1",
       },
       {
