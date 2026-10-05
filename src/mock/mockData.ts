@@ -75,7 +75,8 @@ export const mockProducts: Product[] = [
     imagePublicId: 'sample3',
     secondaryImages: [
       {
-        imageURL: "https://images.unsplash.com/photo-1608248597359-00109673898f?w=500&q=80",
+        // imageURL: "https://images.unsplash.com/photo-1608248597359-00109673898f?w=500&q=80",
+        imageURL: "https://images.unsplash.com/photo-1643747394944-89b11e7fb616",
         imagePublicId: "sample3_sec1",
       },
       {
@@ -102,7 +103,7 @@ export const mockProducts: Product[] = [
     price: 100000,
     stockQuantity: 40,
     imageURL: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80',
-    imagePublicId: 'sample3',
+    imagePublicId: 'sample4',
     secondaryImages: [
       {
         imageURL: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&q=80",
