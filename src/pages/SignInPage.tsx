@@ -4,6 +4,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useAppDispatch } from '../store/hooks'
 import { setUser } from '../store/slices/authSlice';
+import api from '../services/api';
 
 
 export const SignInPage: React.FC = () => {
@@ -14,8 +15,9 @@ export const SignInPage: React.FC = () => {
     const [email,setEmail] = useState<string>('');
     const [password,setPassword] = useState<string>('');
     const [error,setError]  = useState<string | null >(null);
+    const [loading,setLoading] = useState<boolean>(false);
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
 
@@ -29,18 +31,55 @@ export const SignInPage: React.FC = () => {
             return;
         }
 
-        // Dispatch the user detailst to your authSlice
-        dispatch(
-            setUser({
-                id:1,
-                name:email.trim().split('@')[0],
-                email:email.trim(),
-                role:'Customer'
-            })
-        );
+        setLoading(true);
 
-        // Redirect to home catalog after sucessful sign-in
-        navigate('/');
+        try{
+            // 1. Call my ASP.NET Core backend endpoint
+            const response = await api.post('/Auth/login',{
+                email:email.trim(),
+                password:password.trim(),
+            });
+
+            const data = response.data; // AuthResponseDto: { id, name, email, role, token }
+             
+            // 2. Persist the JWT token for Axios interceptors
+            localStorage.setItem('token', data.token);
+
+            // 3. Dispatch user details returned from backend to Redux
+            dispatch(
+                setUser({
+                    id:data.id,
+                    name:data.name,
+                    email:data.email,
+                    role:data.role,
+                })
+            );
+            
+            // 4. Navigate to homepage
+            navigate('/');
+        } catch(err: any){
+            // Capture custom error message returned from controller or generic fallback
+            const errorMessage = 
+                err.response?.data?.message || 'Invalid email or password. Please try again.';
+
+            setError(errorMessage);
+        } finally{
+            setLoading(false);
+        }
+
+
+        // Dispatch the user detailst to your authSlice
+        // dispatch(
+        //     setUser({
+        //         id:1,
+        //         name:email.trim().split('@')[0],
+        //         email:email.trim(),
+        //         role:'Customer'
+        //     })
+        // );
+
+        // // Redirect to home catalog after sucessful sign-in
+        // navigate('/');
     };
 
     return (
@@ -81,6 +120,7 @@ export const SignInPage: React.FC = () => {
                                 placeholder= "user@example.com"
                                 value={email}
                                 onChange = {(e) => setEmail(e.target.value)}
+                                disabled={loading} // <-- Disables input while loading
                                 required
                             />    
                         </div>
@@ -96,7 +136,8 @@ export const SignInPage: React.FC = () => {
                                 className = "form-control form-control-sm"
                                 placeholder="••••••••••••"
                                 value={password}
-                               onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
                                 required
                             />
                         </div>
@@ -112,8 +153,10 @@ export const SignInPage: React.FC = () => {
                         <button
                             type="submit"
                             className = "btn btn-primary w-100 fw-semibold py-2 text-uppercase"
+                            disabled={loading} // <-- Disables button while loading
                         >
-                            Sign In
+                            {loading? 'Signing In...' : 'Sign In'}
+                            {/* Sign In */}
                         </button>
                     </form>    
 
