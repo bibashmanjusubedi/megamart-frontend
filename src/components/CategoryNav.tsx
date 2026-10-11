@@ -2,6 +2,8 @@ import React from "react";
 import { useAppSelector,useAppDispatch } from "../store/hooks";
 import { setSelectedCategory } from "../store/slices/productSlice";
 import { useNavigate } from "react-router-dom"; // Import router navigation
+import { useEffect } from "react";
+import { fetchCategories } from "../store/slices/categorySlice";
 
 export const CategoryNav: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -10,6 +12,11 @@ export const CategoryNav: React.FC = () => {
     // const { selectedCategoryId } = useAppSelector((state) => state.products);
     const { categories } = useAppSelector((state) => state.categories);
     const { selectedCategoryId } = useAppSelector((state) => state.products);
+
+    // 3. Added useEffect to fetch categories automatically when this component mounts
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
     const handleCategoryClick = (categoryId: number | null) => {
         dispatch(setSelectedCategory(categoryId));
