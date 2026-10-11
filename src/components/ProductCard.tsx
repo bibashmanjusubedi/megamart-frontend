@@ -6,11 +6,15 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    // Calculate original price (assuming product.price is 80% of the original)
+    const originalPrice = Math.round(product.price / 0.8);
+    // Calculate exact savings amount
+    const savings = originalPrice - product.price;
     return (
         <div className="card h-100 border rounded-3 shadow-sm position-relative overflow-hidden">
             {/* 56% OFF Badge */}
             <span className="badge bg-primary position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill">
-                56% OFF
+                20% OFF
             </span>
             <img
                 src={product.imageURL}
@@ -24,7 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <div>
                     <span className="fw-bold fs-5 text-dark">₹{product.price.toLocaleString()}</span>
                 </div>
-                <small className="text-sucess fw-bold">Save ₹3,000</small>
+                <small className="text-sucess fw-bold">Save ₹{savings.toLocaleString()}</small>
             </div>
         </div>
     );
