@@ -4,6 +4,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { useAppDispatch } from "../store/hooks";
 import { setUser } from "../store/slices/authSlice";
+import api from "../services/api";
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,11 +17,15 @@ export const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
+    // 1. Client-side validation checks
     // Validate form fields
     if (
       !fullName.trim() ||
@@ -42,17 +47,59 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
-    // Dispatch authenticated user to Redux store
-    dispatch(
-      setUser({
-        id: Date.now(),
-        name: fullName.trim(),
-        email: email.trim(),
-        role: "Customer",
-      }),
-    );
-    // Redirect to home page
-    navigate("/");
+    setLoading(true);
+
+    try{
+      // 2. Call your backend register endpoint (adjust URL path to match your .NET controller route)
+      const response = await api.post("/auth/register",{
+        name:fullName.trim(),
+        email:email.trim(),
+        password:password
+      });
+
+      // Assuming your backend returns a token and user object like { token: "...", user: { id, name, email, role } }
+      const {token, user } = response.data;
+
+      // 3. Save token to localStorage for persistent session
+      localStorage.setItem("token", token);
+
+      // 4. Update Redux store state
+      dispatch(
+        setUser({
+          id:user?.id || Date.now,
+          name:user?.name || fullName.trim(),
+          email:user?.email || email.trim(),
+          role: user?.role || "Customer"
+        })
+      );
+
+      // 5. Redirect user to home page
+      navigate("/");
+      
+    } catch(err:any){
+      // 6. Handle backend validation errors or connection failures gracefully
+      console.error("Registration error:", err);
+      setError(
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Registration failed. Please check your inputs or try again later."
+      );
+    } finally{
+      setLoading(false);
+    }
+
+
+    // // Dispatch authenticated user to Redux store
+    // dispatch(
+    //   setUser({
+    //     id: Date.now(),
+    //     name: fullName.trim(),
+    //     email: email.trim(),
+    //     role: "Customer",
+    //   }),
+    // );
+    // // Redirect to home page
+    // navigate("/");
   };
 
   return (
@@ -94,6 +141,7 @@ export const RegisterPage: React.FC = () => {
                 value={fullName}
                 placeholder="John Doe"
                 onChange={(e) => setFullName(e.target.value)}
+                disabled = {loading}
                 required
               />
             </div>
@@ -113,6 +161,7 @@ export const RegisterPage: React.FC = () => {
                 value={email}
                 placeholder="user@emample.com"
                 onChange={(e) => setEmail(e.target.value)}
+                disabled = {loading}
                 required
               />
             </div>
@@ -132,6 +181,7 @@ export const RegisterPage: React.FC = () => {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled = {loading}
                 required
               />
             </div>
@@ -146,6 +196,7 @@ export const RegisterPage: React.FC = () => {
                 className="form-control form-control-sm"
                 placeholder="************"
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled = {loading}
                 required
               />
             </div>
@@ -158,6 +209,7 @@ export const RegisterPage: React.FC = () => {
                 className="form-check-input"
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
+                disabled = {loading}
               />
 
               <label className="form-check-label small text-muted" htmlFor="termsCheck">
@@ -169,8 +221,9 @@ export const RegisterPage: React.FC = () => {
             <button 
                 type="submit"
                 className="btn btn-primary w-100 fw-semibold py-2 text-uppercase"
+                disabled = {loading}
             >
-                Sign Up
+                {loading ?'Creating Account' : 'Sign Up'}
             </button>
           </form>
 
