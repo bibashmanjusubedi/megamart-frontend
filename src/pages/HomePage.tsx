@@ -6,6 +6,7 @@ import { Footer } from "../components/Footer";
 import { useAppSelector } from "../store/hooks";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { getCategoryIcon } from "../utils/iconMap";
 
 export const HomePage: React.FC = () => {
   const products = useAppSelector((state) => state.products.products);
@@ -50,22 +51,28 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="d-flex align-items-center justify-content-between text-center overflow-auto py-2">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                className="d-flex flex-column align-items-center text-decoration-none"
-                style={{ minWidth:'90px'}}
-                to={`/products?category=${category.id}`}
-              >
-                <div
-                  className="rounded-circle bg-light border d-flex align-items-center justify-content-center shadow-sm mb-2"
-                  style={{ width: '70px', height:'70px'}}
+            {categories.map((category) => {
+              // 2. Resolve the matching icon class based on category name
+              const iconClass = getCategoryIcon(category.name);
+              
+              return (
+                <Link
+                  key={category.id}
+                  className="d-flex flex-column align-items-center text-decoration-none"
+                  style={{ minWidth:'90px'}}
+                  to={`/products?category=${category.id}`}
                 >
-                  <i className="bi bi-shop fs-3 text-primary"></i>
-                </div>
-                <span className="small fw-semibold text-dark">{category.name}</span>
-              </Link>
-            ))}
+                  <div
+                    className="rounded-circle bg-light border d-flex align-items-center justify-content-center shadow-sm mb-2"
+                    style={{ width: '70px', height:'70px'}}
+                  >
+                    <i className={`bi ${iconClass} fs-3 text-primary`}></i>
+                    {/* <i className="bi bi-shop fs-3 text-primary"></i> */}
+                  </div>
+                  <span className="small fw-semibold text-dark">{category.name}</span>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
