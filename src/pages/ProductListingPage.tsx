@@ -7,6 +7,9 @@ import { Footer } from "../components/Footer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setSelectedCategory } from "../store/slices/productSlice";
 import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom"
+import { useEffect } from "react"; 
+import { fetchProducts } from "../store/slices/productSlice";
 
 export const ProductListingPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +19,24 @@ export const ProductListingPage: React.FC = () => {
   const { categories } = useAppSelector((state) => state.categories);
 
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
+  // ADD IT HERE: This fetches your products from your .NET API when the page loads
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+
+  // 4. Sync URL query parameter (?category=7) into Redux state on load or change
+  useEffect(() => {
+    if (categoryParam) {
+      dispatch(setSelectedCategory(Number(categoryParam)));
+    } else {
+      dispatch(setSelectedCategory(null));
+    }
+  }, [categoryParam,dispatch])
 
   // Local filter states
   const [minPrice, setMinPrice] = useState<string>("");
@@ -79,6 +100,10 @@ export const ProductListingPage: React.FC = () => {
     if (sortBy === "price-high") return Number(b.price) - Number(a.price);
     return 0; // Default/Featured
   });
+
+  // Add them here right before your component returns its JSX
+  console.log("All Products from Redux:", products);
+  console.log("Selected Category ID from URL/Redux:", selectedCategoryId)
 
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
