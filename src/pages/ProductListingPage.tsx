@@ -38,6 +38,10 @@ export const ProductListingPage: React.FC = () => {
     }
   }, [categoryParam,dispatch])
 
+  // Add pagination state near your other useState hooks
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerpage = 6; // Change this to how many products you want per page
+
   // Local filter states
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -100,6 +104,17 @@ export const ProductListingPage: React.FC = () => {
     if (sortBy === "price-high") return Number(b.price) - Number(a.price);
     return 0; // Default/Featured
   });
+
+  // Pagination math
+  const indexOfLastItem = currentPage * itemsPerpage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerpage;
+  const currentProducts = sortedProducts.slice(indexOfFirstItem, indexOfLastItem); 
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerpage);
+
+  // Calculate dynamic display range for current page
+  const totalFilteredItems = sortedProducts.length;
+  const startItemIndex = totalFilteredItems === 0 ? 0: (currentPage -1) * itemsPerpage + 1;
+  const endItemIndex = Math.min(currentPage * itemsPerpage, totalFilteredItems);
 
   // Add them here right before your component returns its JSX
   console.log("All Products from Redux:", products);
@@ -245,7 +260,7 @@ export const ProductListingPage: React.FC = () => {
                   ? categories.find((c) => c.id === selectedCategoryId)?.name
                   : 'All Products'}{' '}
                   <span className="text-muted fw-normal fs-7">
-                    (Showing 1-{sortedProducts.length} of {sortedProducts.length} items)
+                    (Showing {startItemIndex}-{endItemIndex} of {totalFilteredItems} items)
                   </span>
                 </h6>
 
@@ -267,9 +282,9 @@ export const ProductListingPage: React.FC = () => {
               </div>
 
               {/* Product Grid */}
-              {sortedProducts.length > 0 ? (
+              {currentProducts.length > 0 ? (
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
-                  {sortedProducts.map((product) => (
+                  {currentProducts.map((product) => (
                     <div key={product.id} className="col" style = {{ cursor:"pointer"}} onClick={() => navigate(`/products/${product.id}`)}>
                       <ProductCard product={product} />
                     </div>
@@ -286,31 +301,26 @@ export const ProductListingPage: React.FC = () => {
               {/* Pagination Controls */}
               <nav aria-label="Catalog Page Navigation" className="d-flex justify-content-center mt-4">
                 <ul className="pagination pagination-sm mb-0">
-                  <li className="page-item disabled">
-                    <span className="page-link">Previous</span>
+                  <li className={`page-item ${currentPage === 1 ? "disabled": ""}`}>
+                    <button className="page-link" onClick={() => setCurrentPage((prev) => Math.max(prev-1,1))}>
+                      Previous
+                    </button>
                   </li>
 
-                  <li className="page-item active">
-                    <span className="page-link">1</span>
-                  </li>
+                  {Array.from({length: totalPages},(_,index) =>(
+                    <li key= {index + 1} className= {`page-item ${currentPage === index + 1 ? 'active': ""}`}>
+                      <button className = "page-link"  onClick ={() => setCurrentPage(index + 1)}>
+                        { index + 1}
+                      </button>
+                    </li>
+                  ))}
 
-                  <li className="page-item">
-                    <a className="page-link" href="#">
-                      2
-                    </a>
-                  </li>
-
-                  <li className="page-item">
-                    <a className="page-link" href="#">
-                      3
-                    </a>
-                  </li>
-
-                  <li className="page-item">
-                    <a className="page-link" href="#">
-                      Next
-                    </a>
-                  </li>
+                    <li className={`page-item ${currentPage === totalPages || totalPages  === 0 ? "disabled" : ""}`}>
+                      <button className="page-link" onClick = {() => setCurrentPage((prev) => Math.min(prev+1, totalPages))}>
+                        Next
+                      </button>
+                    </li>
+                  
                 </ul>
               </nav>
             </section>
