@@ -14,6 +14,8 @@ export const HomePage: React.FC = () => {
 
   const navigate = useNavigate();
 
+  const smartphoneProducts = products.filter((product) => product.categoryId === 1);
+
 
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
@@ -34,7 +36,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="row row-cols-1  row-cols-sm-2 row-cols-md-4 g-3">
-            {products.slice(0, 4).map((product) => (
+            {smartphoneProducts.slice(0, 4).map((product) => (
               <div key={product.id} className="col" style = {{ cursor:"pointer"}} onClick={() => navigate(`/products/${product.id}`)}>
                 <ProductCard product={product} />
               </div>
