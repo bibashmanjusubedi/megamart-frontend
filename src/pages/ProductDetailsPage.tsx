@@ -38,7 +38,7 @@ export const ProductDetailsPage: React.FC = () => {
   // Sync state when product loads or route param changes
   useEffect(() => {
     if (product) {
-      setActivePrimaryImage(product.imageURL);
+      setActivePrimaryImage(product.imageUrl);
       setHoveredImage(null);
       setQuantity(1);
     }

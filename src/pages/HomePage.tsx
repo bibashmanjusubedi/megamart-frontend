@@ -14,6 +14,7 @@ export const HomePage: React.FC = () => {
 
   const navigate = useNavigate();
 
+
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
       {/* 1. Header Navbar */}
@@ -80,7 +81,7 @@ export const HomePage: React.FC = () => {
         <section className="mb-5">
           <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
             <h5 className="fw-bold text-dark m-0">Daily Essentials</h5>
-            <a href="/products?category=groceries" className="text-primary text-decoration-none fw-semibold small">
+            <a href="/products" className="text-primary text-decoration-none fw-semibold small">
               View All <i className="bi bi-chevron-right"></i>
             </a>
           </div>
