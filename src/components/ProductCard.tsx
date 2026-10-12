@@ -17,7 +17,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 20% OFF
             </span>
             <img
-                src={product.imageURL}
+                src={product.imageUrl}
                 alt={product.name}
                 className="card-img-top p-3"
                 style= {{height:'100px',objectFit:'contain'}}

@@ -20,9 +20,9 @@ export const ProductDetailsPage: React.FC = () => {
   // Gallery array: default main image + secondary angle images
   const galleryImages: string[] = product
     ? [
-        product.imageURL,
+        product.imageUrl,
         ...(product.secondaryImages || []).map((img) =>
-          typeof img === "string" ? img : img.imageURL,
+          typeof img === "string" ? img : img.imageUrl,
         ),
       ]
     : [];
