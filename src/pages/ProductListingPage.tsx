@@ -42,6 +42,11 @@ export const ProductListingPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerpage = 6; // Change this to how many products you want per page
 
+  // Reset to page 1 whenever category or search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  },[selectedCategoryId,searchQuery]);
+
   // Local filter states
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
