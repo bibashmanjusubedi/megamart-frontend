@@ -13,6 +13,9 @@ export const ProductDetailsPage: React.FC = () => {
   const products = useAppSelector((state) => state.products.products);
   const { categories } = useAppSelector((state) => state.categories);
 
+  // 👈 Access authentication state from Redux (adjust slice name if yours differs, e.g., state.auth.user)
+  const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated);
+
   // Find product and corresponding category
   const product = products.find((p) => String(p.id) === String(id));
   const category = categories.find((c) => c.id === product?.categoryId);
@@ -77,12 +80,25 @@ export const ProductDetailsPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
+    // Authentication check
+    if (!isAuthenticated){
+      alert("Please sign in or register");
+      navigate("/signin");
+      return;
+    }
     alert(`Added ${quantity}x "${product.name}" to cart!`);
+    navigate("/cart");
   };
 
   const handleBuyNow = () => {
+    // 👈 Authentication check
+    if (!isAuthenticated){
+      alert("Please sign in or register");
+      navigate("/signin");
+      return;
+    }
     alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
-    navigate("/cart");
+    navigate("/orders");
   };
 
   // Image currently displayed on the main display card
