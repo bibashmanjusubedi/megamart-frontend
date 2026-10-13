@@ -87,7 +87,7 @@ export const ProductDetailsPage: React.FC = () => {
 
   // Image currently displayed on the main display card
   const displayedMainImage =
-    hoveredImage || activePrimaryImage || product.imageURL;
+    hoveredImage || activePrimaryImage || product.imageUrl;
 
   return (
     <div className="min-vh-100 d-flex flex-column bg-white">
