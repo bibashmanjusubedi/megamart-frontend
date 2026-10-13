@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector,useAppDispatch } from '../store/hooks';
 import { setSearchQuery } from '../store/slices/productSlice';
 import { logout } from '../store/slices/authSlice';
+import { clearCart } from '../store/slices/cartSlice';
 
 export const Header:React.FC = () => {
     const dispatch = useAppDispatch();
@@ -16,6 +17,8 @@ export const Header:React.FC = () => {
         localStorage.removeItem('token');
         // 2. Clear user state in Redux
         dispatch(logout());
+
+        dispatch(clearCart());
 
         // 3. Redirect to sign-in or home page
         navigate('/signin');

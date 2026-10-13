@@ -3,7 +3,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { CategoryNav } from "../components/CategoryNav";
 import { Footer } from "../components/Footer";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { addToCart } from "../store/slices/cartSlice";
+
 
 export const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -79,6 +81,8 @@ export const ProductDetailsPage: React.FC = () => {
     });
   };
 
+  const dispatch = useAppDispatch();
+
   const handleAddToCart = () => {
     // Authentication check
     if (!isAuthenticated){
@@ -86,6 +90,10 @@ export const ProductDetailsPage: React.FC = () => {
       navigate("/signin");
       return;
     }
+
+    // 👈 2. Dispatch the item to your Redux cart store
+    dispatch(addToCart({product, quantity}));
+    
     alert(`Added ${quantity}x "${product.name}" to cart!`);
     navigate("/cart");
   };

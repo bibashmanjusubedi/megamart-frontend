@@ -94,7 +94,7 @@ export const CartPage: React.FC = () => {
                                                     style = {{ width:'85px', height:'85px' }}
                                                 >
                                                     <img
-                                                        src={product.imageURL}
+                                                        src={product.imageUrl}
                                                         alt={product.name}
                                                         className="img-fluid rounded"
                                                         style = {{ maxHeight:'100%',objectFit:'contain' }}
