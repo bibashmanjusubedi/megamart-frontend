@@ -5,7 +5,7 @@ import { CategoryNav } from "../components/CategoryNav";
 import { Footer } from "../components/Footer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addToCart } from "../store/slices/cartSlice";
-
+import { addOrder } from "../store/slices/orderSlice";
 
 export const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +17,10 @@ export const ProductDetailsPage: React.FC = () => {
 
   // 👈 Access authentication state from Redux (adjust slice name if yours differs, e.g., state.auth.user)
   const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated);
+
+  // Safely extract user ID checking common auth slice patterns (user.id, userId, or fallback to 1)
+  const currentUser = useAppSelector((state) => state.auth?.currentUser);
+  // const userId = currentUser?.id;
 
   // Find product and corresponding category
   const product = products.find((p) => String(p.id) === String(id));
@@ -48,6 +52,8 @@ export const ProductDetailsPage: React.FC = () => {
       setQuantity(1);
     }
   }, [product]);
+
+  const dispatch = useAppDispatch();
 
   if (!product) {
     return (
@@ -81,7 +87,7 @@ export const ProductDetailsPage: React.FC = () => {
     });
   };
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
   const handleAddToCart = () => {
     // Authentication check
@@ -105,6 +111,29 @@ export const ProductDetailsPage: React.FC = () => {
       navigate("/signin");
       return;
     }
+
+    const generatedOrderId = Date.now();
+
+    // 1. Dispatch the order to your Redux orders slice state
+    dispatch(addOrder({
+      id:generatedOrderId,
+      userId:currentUser!.id,
+      status:'Processing',
+      totalAmount:product.price * quantity,
+      createdAt: new Date().toDateString(),
+      orderItems:[
+        {
+          id:Date.now(),
+          orderId:generatedOrderId,
+          productId: product.id,
+          quantity:quantity,
+          unitPrice:product.price,
+          product:product
+        }
+      ]
+
+    }));
+
     alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
     navigate("/orders");
   };

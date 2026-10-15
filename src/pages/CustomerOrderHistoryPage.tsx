@@ -8,6 +8,8 @@ import type { Order } from '../types';
 export const CustomerOrderHistoryPage: React.FC = () => {
   const { orders } = useAppSelector((state) => state.orders);
 
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   const getStatusBadge = (status: Order['status']) => {
     switch (status) {
       case 'Completed':
@@ -64,6 +66,10 @@ export const CustomerOrderHistoryPage: React.FC = () => {
     });
   };
 
+
+  // Condition: Show orders only if authenticated AND orders array has items
+  const hasOrders = isAuthenticated && orders && orders.length > 0;
+
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Header />
@@ -85,7 +91,7 @@ export const CustomerOrderHistoryPage: React.FC = () => {
 
         <h4 className="fw-bold text-dark mb-4">Order History</h4>
 
-        {orders.length === 0 ? (
+        {!hasOrders ? (
           <div className="card border-0 shadow-sm text-center py-5">
             <div className="card-body">
               <i className="bi bi-bag-x fs-1 text-muted mb-3 d-block"></i>
@@ -139,7 +145,7 @@ export const CustomerOrderHistoryPage: React.FC = () => {
                           style={{ width: '70px', height: '70px' }}
                         >
                           <img
-                            src={item.product?.imageURL || 'https://via.placeholder.com/70'}
+                            src={item.product?.imageUrl || 'https://via.placeholder.com/70'}
                             alt={item.product?.name || `Product ${item.productId}`}
                             className="img-fluid rounded"
                             style={{ maxHeight: '100%', objectFit: 'contain' }}
