@@ -45,7 +45,8 @@ export interface Order{
     totalAmount: number;
     status: 'Pending' | 'Processing' | 'Completed' | 'Cancelled';
     createdAt?: string;
-    orderItems?: OrderItem[]; // Optional property to hold related order items
+    items:OrderItem[];
+    // orderItems?: OrderItem[]; // Optional property to hold related order items
 }
 
 export interface OrderItem{

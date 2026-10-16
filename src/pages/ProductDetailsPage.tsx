@@ -6,6 +6,8 @@ import { Footer } from "../components/Footer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addToCart } from "../store/slices/cartSlice";
 import { addOrder } from "../store/slices/orderSlice";
+// import axios from "axios";
+import api from "../services/api";
 
 export const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -104,7 +106,7 @@ export const ProductDetailsPage: React.FC = () => {
     navigate("/cart");
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async() => {
     // 👈 Authentication check
     if (!isAuthenticated){
       alert("Please sign in or register");
@@ -114,28 +116,49 @@ export const ProductDetailsPage: React.FC = () => {
 
     const generatedOrderId = Date.now();
 
-    // 1. Dispatch the order to your Redux orders slice state
-    dispatch(addOrder({
-      id:generatedOrderId,
-      userId:currentUser!.id,
-      status:'Processing',
-      totalAmount:product.price * quantity,
-      createdAt: new Date().toDateString(),
-      orderItems:[
-        {
-          id:Date.now(),
-          orderId:generatedOrderId,
-          productId: product.id,
-          quantity:quantity,
-          unitPrice:product.price,
-          product:product
-        }
-      ]
+    try{
+      // 1. Send the expected DTO body to your backend API
+     const response = await api.post('/Orders', {
+        userId: currentUser!.id,
+        items: [
+          {
+            productId: product.id,
+            quantity: quantity
+          }
+        ]
+      });
 
-    }));
+      alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
+      navigate("/orders");
+    } catch(error){
+      console.error("Failed to place order:", error);
+      alert("Error placing order. Please try again.");
+    }
 
-    alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
-    navigate("/orders");
+    // // 1. Dispatch the order to your Redux orders slice state for local without database interaction
+    // dispatch(addOrder({
+    //   id:generatedOrderId,
+    //   userId:currentUser!.id,
+    //   status:'Processing',
+    //   totalAmount:product.price * quantity,
+    //   createdAt: new Date().toDateString(),
+    //   orderItems:[
+    //     {
+    //       id:Date.now(),
+    //       orderId:generatedOrderId,
+    //       productId: product.id,
+    //       quantity:quantity,
+    //       unitPrice:product.price,
+    //       product:product
+    //     }
+    //   ]
+
+    // }));
+
+    // alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
+    // navigate("/orders");
+
+
   };
 
   // Image currently displayed on the main display card

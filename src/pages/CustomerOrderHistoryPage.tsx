@@ -4,11 +4,21 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useAppSelector } from '../store/hooks';
 import type { Order } from '../types';
+import { fetchOrders } from '../store/slices/orderSlice';
+import { useEffect } from 'react';
+import { useAppDispatch } from '../store/hooks';
+
 
 export const CustomerOrderHistoryPage: React.FC = () => {
   const { orders } = useAppSelector((state) => state.orders);
 
   const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
   const getStatusBadge = (status: Order['status']) => {
     switch (status) {
@@ -134,7 +144,7 @@ export const CustomerOrderHistoryPage: React.FC = () => {
                 {/* Items List */}
                 <div className="card-body p-3">
                   <div className="d-flex flex-column gap-3">
-                    {order.orderItems?.map((item) => (
+                    {order.items?.map((item) => (
                       <div
                         key={item.id}
                         className="d-flex align-items-center gap-3 py-2 border-bottom"
