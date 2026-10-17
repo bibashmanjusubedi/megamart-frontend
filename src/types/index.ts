@@ -91,7 +91,17 @@ export interface AuthResponse{
 // 3. CART & UI HELPERS
 // ==========================================
 
-export interface CartItem{
-    product: Product;
-    quantity: number;
+// export interface CartItem{
+//     product: Product;
+//     quantity: number;
+// }
+
+export interface CartItem {
+  id: number;
+  productId: number;
+  productName: string;
+  unitPrice: number;
+  imageUrl: string;
+  quantity: number;
+  totalPrice: number;
 }

@@ -8,6 +8,7 @@ import { addToCart } from "../store/slices/cartSlice";
 import { addOrder } from "../store/slices/orderSlice";
 // import axios from "axios";
 import api from "../services/api";
+import { addToCartBackend } from "../store/slices/cartSlice";
 
 export const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -91,7 +92,7 @@ export const ProductDetailsPage: React.FC = () => {
 
   // const dispatch = useAppDispatch();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async() => {
     // Authentication check
     if (!isAuthenticated){
       alert("Please sign in or register");
@@ -99,11 +100,28 @@ export const ProductDetailsPage: React.FC = () => {
       return;
     }
 
+    try{
+      // 2. Dispatch the thunk and unwrap the promise to catch potential errors
+      await dispatch(
+        addToCartBackend({
+          productId:product.id,
+          quantity:quantity,
+        })
+      ).unwrap();
+
+      alert(`Added ${quantity}x "${product.name}" to cart!`);
+      navigate("/cart");
+
+    } catch(error){
+      console.error("Failed to add to cart:", error);
+      alert("Failed to add item to cart. Please try again.");
+    }
+
     // 👈 2. Dispatch the item to your Redux cart store
-    dispatch(addToCart({product, quantity}));
+    // dispatch(addToCart({product, quantity}));
     
-    alert(`Added ${quantity}x "${product.name}" to cart!`);
-    navigate("/cart");
+    // alert(`Added ${quantity}x "${product.name}" to cart!`);
+    // navigate("/cart");
   };
 
   const handleBuyNow = async() => {
