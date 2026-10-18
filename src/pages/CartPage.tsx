@@ -10,10 +10,12 @@ import {
   setPaymentMethod,
   setDeliveryAddress,
   clearCart,
+  updateCartItemQuantity,
 } from "../store/slices/cartSlice";
 
 import { fetchCart } from "../store/slices/cartSlice";
 import { fetchProducts } from "../store/slices/productSlice";
+
 
 export const CartPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -48,13 +50,20 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
 
   const handleQuantityDelta = (
     productId: number,
+    cartItemId: number,
     currentQty: number,
     delta: number,
     maxStock: number,
   ) => {
     const next = currentQty + delta;
     if (next >= 1 && next <= maxStock) {
+      // dispatch(updateQuantity({ productId, quantity: next }));
+      // dispatch(updateCartItemQuantity({ cartItemId, quantity:next }))
+      // 1. Instantly update local Redux state so the UI changes smoothly with zero delay
       dispatch(updateQuantity({ productId, quantity: next }));
+      
+      // 2. Silently update the database in the background
+      dispatch(updateCartItemQuantity({ cartItemId, quantity: next }));
     }
   };
 
@@ -93,7 +102,7 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
           </span>
         </h4>
 
-        {items.length === 0 ? (
+        {items.length === 0 || products.length === 0  ? (
           <div className="text-center py-5 border rounded bg-light my-3">
             <i className="bi bi-cart-x fs-1 text-muted mb-3 d-block"></i>
             <h5 className="fw-semibold">Your cart is empty</h5>
@@ -117,7 +126,9 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
                 <div className="d-flex flex-column gap-3">
                   {items.map((item) => {
                     const matchedProduct = products.find((p) => p.id === item.productId);
-                    const stockQuantity = matchedProduct!.stockQuantity;
+                    // const stockQuantity = matchedProduct!.stockQuantity;
+                    // 🛡️ Safe optional chaining prevents white-screen crashes on refresh
+                    const stockQuantity = matchedProduct?.stockQuantity ?? item.quantity;
                     const category = categories.find(
                       (c) => c.id === item.productId,
                     );
@@ -168,6 +179,7 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
                                   onClick={() =>
                                     handleQuantityDelta(
                                       item.productId,
+                                      item.id, // 👈 Pass cartItemId (item.id) here
                                       item.quantity,
                                       -1,
                                       stockQuantity,
@@ -189,6 +201,7 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
                                   onClick={() =>
                                     handleQuantityDelta(
                                       item.productId,
+                                       item.id, // 👈 Pass cartItemId (item.id) here
                                       item.quantity,
                                       1,
                                       stockQuantity,
