@@ -11,7 +11,8 @@ import {
   setDeliveryAddress,
   clearCart,
   updateCartItemQuantity,
-  removeCartItemFromApi
+  removeCartItemFromApi,
+  checkoutOrder
 } from "../store/slices/cartSlice";
 
 import { fetchCart } from "../store/slices/cartSlice";
@@ -83,13 +84,45 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (items.length === 0) return;
-    alert(
-      `Order placed successfully!\nTotal Amount: ₹${total.toLocaleString()}\nPayment: ${paymentMethod.toUpperCase()}`,
-    );
-    dispatch(clearCart());
-    navigate("/");
+
+
+    try{
+      // 1. Dispatch the backend checkout thunk, passing the chosen address & payment method
+      const resultAction = await dispatch(
+        checkoutOrder({
+          deliveryAddress,
+          paymentMethod
+        })
+      );
+
+      // 2. Check if the backend successfully processed the order
+      if (checkoutOrder.fulfilled.match(resultAction)){
+        alert(
+          `Order placed successfully!\n\n` +
+          `💰 Total Amount: ₹${total.toLocaleString()}\n` +
+          `📦 Delivery Address: ${deliveryAddress || "N/A"}\n` +
+          `💳 Payment Method: ${paymentMethod.toUpperCase()}`
+        );
+        navigate("/");
+        
+      } else {
+        // 3. Handle backend errors (e.g., insufficient stock)
+        alert(`Checkout failed: ${resultAction.payload}`);
+      }
+
+    } catch(err){
+      console.error("Checkout error:", err);
+      alert("An unexpected error occurred during checkout.");
+    }
+
+
+    // alert(
+    //   `Order placed successfully!\nTotal Amount: ₹${total.toLocaleString()}\nPayment: ${paymentMethod.toUpperCase()}`,
+    // );
+    // dispatch(clearCart());
+    // navigate("/");
   };
 
 

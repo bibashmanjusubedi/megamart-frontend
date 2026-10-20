@@ -91,6 +91,41 @@ export const removeCartItemFromApi = createAsyncThunk(
 );
 
 
+export const checkoutOrder = createAsyncThunk(
+  "cart/checkoutOrder",
+  async(
+    checkoutDetails: {deliveryAddress?:string;paymentMethod?:string}= {},
+    { getState, rejectWithValue } 
+  ) => {
+    try {
+      const state: any = getState();
+      const cartItems = state.cart.items;// Pulls from Redux state
+
+      if (!cartItems || cartItems.length === 0 ){
+        return rejectWithValue("Your cart is empty");
+      }
+
+      // Build payload matching your backend CreateOrderDto
+      const payload = {
+        deliveryAddress: checkoutDetails?.deliveryAddress || null,
+        paymentMethod: checkoutDetails?.paymentMethod || null,
+        items: cartItems.map((item:any) => ({
+          productId: item.productId,
+          quantity:item.quantity
+        })),
+      };
+
+      const response = await api.post("/Orders", payload);
+
+      return response.data;
+
+    } catch(error:any){
+      return rejectWithValue(error.response?.data || "Checkout failed");
+    }
+  }
+)
+
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -151,7 +186,11 @@ export const cartSlice = createSlice({
       .addCase(removeCartItemFromApi.fulfilled,(state,action) => {
         // Filter out the deleted item by its cart item ID (item.id)
         state.items = state.items.filter((item) => item.id !== action.payload);
-      });
+      })
+      .addCase(checkoutOrder.fulfilled, (state) => {
+        state.items = [];
+        state.deliveryAddress = "";
+      })
   },
 });
 
