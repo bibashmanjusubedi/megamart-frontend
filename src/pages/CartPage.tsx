@@ -11,6 +11,7 @@ import {
   setDeliveryAddress,
   clearCart,
   updateCartItemQuantity,
+  removeCartItemFromApi
 } from "../store/slices/cartSlice";
 
 import { fetchCart } from "../store/slices/cartSlice";
@@ -47,6 +48,14 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
   const discount = subtotal > 0 ? 2000 : 0;
   const shipping = 0; // FREE
   const total = Math.max(0, subtotal - discount + shipping);
+
+  const handleRemoveItem = (productId:number, cartItemId:number) => {
+    // Instantly update local Redux state for zero-delay UI responsiveness
+    dispatch(removeFromCart(productId));
+
+    // Silentlty trigger the backend delete API
+    dispatch(removeCartItemFromApi(cartItemId));
+  }
 
   const handleQuantityDelta = (
     productId: number,
@@ -217,9 +226,9 @@ const subtotal = items.reduce((acc, item) => acc + (item.unitPrice || 0) * (item
                             <button
                               type="button"
                               className="btn btn-sm text-danger text-decoration-none d-flex align-items-center gap-1"
-                              onClick={() =>
-                                dispatch(removeFromCart(item.productId))
-                              }
+                              // onClick={() =>
+                              //   dispatch(removeFromCart(item.productId))
+                              onClick = {() => handleRemoveItem(item.productId,item.id)}
                             >
                               <i className="bi bi-trash"></i> Remove
                             </button>

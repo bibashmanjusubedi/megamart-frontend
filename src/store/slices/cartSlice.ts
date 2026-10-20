@@ -78,6 +78,19 @@ export const updateCartItemQuantity = createAsyncThunk(
   },
 );
 
+export const removeCartItemFromApi = createAsyncThunk(
+  "cart/removeCartItemFromApi",
+  async(cartItemId:number,{ rejectWithValue }) => {
+    try{
+        await api.delete(`/Carts/items/${cartItemId}`);
+        return cartItemId;
+    } catch (error: any){
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -134,6 +147,10 @@ export const cartSlice = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(removeCartItemFromApi.fulfilled,(state,action) => {
+        // Filter out the deleted item by its cart item ID (item.id)
+        state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });
