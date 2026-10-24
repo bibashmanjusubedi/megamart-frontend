@@ -52,8 +52,8 @@ interface CategoryState {
 }
 
 const initialState: CategoryState = {
-  categories: mockCategories,
-  // categories: [],
+  // categories: mockCategories,
+  categories: [],
   isLoading: false,
   error: null,
 };

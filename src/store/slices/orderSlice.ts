@@ -32,6 +32,20 @@ export const fetchOrders = createAsyncThunk(
 );
 
 
+// 2. Thunk for fetching ALL orders (Authorized/Admin endpoint)
+export const fetchAllOrders = createAsyncThunk(
+  'order/fetchAllOrders',
+  async(_,{ rejectWithValue }) => {
+    try{
+      // Adjust '/Orders' to match your exact backend route for all orders if different
+      const response  = await api.get<Order[]>('/Orders');
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any){
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch all orders');
+    }
+  }
+);
+
 
 export const orderSlice = createSlice({
   name: 'orders',
@@ -66,6 +80,19 @@ export const orderSlice = createSlice({
         state.orders = action.payload; // Populates state with data from GET /api/Orders
       })
       .addCase(fetchOrders.rejected, (state,action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // fetchAllOrders (All Orders / Admin)
+      .addCase(fetchAllOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
+        state.loading = false;
+        state.orders = action.payload; // Populates state with all orders
+      })
+      .addCase(fetchAllOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

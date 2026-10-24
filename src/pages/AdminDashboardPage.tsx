@@ -6,15 +6,28 @@ import { deleteProduct } from '../store/slices/productSlice';
 import { logout } from '../store/slices/authSlice';
 import type { Order } from '../types';
 import { useEffect } from 'react';
+import { fetchAllOrders } from '../store/slices/orderSlice';
+import { fetchCategories } from '../store/slices/categorySlice';
+import { fetchProducts } from '../store/slices/productSlice';
 
 export const AdminDashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+
+  
+  useEffect(() => {
+    dispatch(fetchAllOrders());
+    dispatch(fetchProducts());
+    dispatch(fetchCategories());
+}, [dispatch]);
+
   const { orders } = useAppSelector((state) => state.orders);
   const { products } = useAppSelector((state) => state.products);
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
+
+
 
 
 

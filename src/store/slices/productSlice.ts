@@ -15,7 +15,8 @@ interface ProductState {
 }
 
 const initialState: ProductState = {
-    products: mockProducts,
+    // products: mockProducts,
+    products:[],
     searchQuery: '',
     // categories: mockCategories,
     selectedCategoryId: null,
