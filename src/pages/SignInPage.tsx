@@ -55,8 +55,14 @@ export const SignInPage: React.FC = () => {
                 })
             );
             
-            // 4. Navigate to homepage
-            navigate('/');
+            // // 4. Navigate to homepage
+            // navigate('/');
+            if (data.role?.toLowerCase() == 'admin'){
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
+
         } catch(err: any){
             // Capture custom error message returned from controller or generic fallback
             const errorMessage = 

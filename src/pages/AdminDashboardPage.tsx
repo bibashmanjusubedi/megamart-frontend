@@ -5,6 +5,7 @@ import { updateOrderStatus } from '../store/slices/orderSlice';
 import { deleteProduct } from '../store/slices/productSlice';
 import { logout } from '../store/slices/authSlice';
 import type { Order } from '../types';
+import { useEffect } from 'react';
 
 export const AdminDashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -15,10 +16,24 @@ export const AdminDashboardPage: React.FC = () => {
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
 
+
+
   // Active navigation tab
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'categories' | 'orders' | 'users'>('overview');
   // Order search query
   const [orderSearch, setOrderSearch] = useState<string>('');
+
+    // Route Guard: Redirect non-admins or guests away from the admin panel
+  useEffect(() => {
+    if(!currentUser || currentUser.role?.toLowerCase() != 'admin'){
+      navigate('/signin', { replace: true });
+    }
+  }, [currentUser, navigate]);
+
+  // If user state is still resolving or unauthorized, render nothing or a blank screen briefly
+  if (!currentUser || currentUser.role?.toLowerCase() !=='admin'){
+    return null;
+  }
 
   const handleLogout = () => {
     dispatch(logout());
