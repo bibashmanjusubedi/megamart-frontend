@@ -42,6 +42,7 @@ export interface User{
 export interface Order{
     id: number;
     userId: number;
+    email:string;
     totalAmount: number;
     status: 'Pending' | 'Processing' | 'Completed' | 'Cancelled';
     createdAt?: string;

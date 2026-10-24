@@ -62,7 +62,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Filtered orders based on Search input
   const filteredOrders = orders.filter((ord) => {
-    const email = customerEmails[ord.id] || `customer${ord.userId}@domain.com`;
+    const email = ord.email || customerEmails[ord.id] || `customer${ord.userId}@domain.com`;
     const term = orderSearch.toLowerCase().trim();
     return ord.id.toString().includes(term) || email.toLowerCase().includes(term);
   });
@@ -198,7 +198,7 @@ export const AdminDashboardPage: React.FC = () => {
                   </tr>
                 ) : (
                   filteredOrders.map((ord) => {
-                    const email = customerEmails[ord.id] || `customer${ord.userId}@domain.com`;
+                    const email = ord.email || customerEmails[ord.id] || `customer${ord.userId}@domain.com`;
                     return (
                       <tr key={ord.id}>
                         <td className="fw-bold text-primary">#ORD-{ord.id}</td>
