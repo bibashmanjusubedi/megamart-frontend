@@ -64,7 +64,21 @@ export const AdminDashboardPage: React.FC = () => {
   const filteredOrders = orders.filter((ord) => {
     const email = ord.email || customerEmails[ord.id] || `customer${ord.userId}@domain.com`;
     const term = orderSearch.toLowerCase().trim();
-    return ord.id.toString().includes(term) || email.toLowerCase().includes(term);
+
+    if (!term) return true;
+
+    const idStr = ord.id.toString(); 
+    const ordPrefix = `ord-${ord.id}`.toLowerCase();
+    const hashPrefix = `#ord-${ord.id}`.toLowerCase();
+
+    return (
+      idStr.includes(term) ||
+      ordPrefix.includes(term) ||
+      hashPrefix.includes(term) ||
+      email.toLowerCase().includes(term)
+    );
+
+    // return ord.id.toString().includes(term) || email.toLowerCase().includes(term);
   });
 
   const renderStatusBadge = (status: Order['status']) => {
