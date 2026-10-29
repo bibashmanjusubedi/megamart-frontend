@@ -116,56 +116,10 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-vh-100 bg-light d-flex flex-column font-monospace">
-      {/* Top Console Bar */}
-      <header className="bg-dark text-white border-bottom border-secondary py-2 px-3">
-        <div className="container-fluid d-flex justify-content-between align-items-center">
-          <span className="fw-bold fs-6">MegaMart Admin Console</span>
-          <div className="d-flex align-items-center gap-3 small">
-            <span>
-              <i className="bi bi-person-circle me-1"></i>
-              [{currentUser?.name || 'Admin User'}]
-            </span>
-            <button
-              onClick={handleLogout}
-              className="btn btn-outline-light btn-sm font-monospace py-0 px-2"
-            >
-              [Logout]
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Admin Module Navigation Tabs */}
-      <nav className="bg-secondary bg-opacity-10 border-bottom px-3 py-2">
-        <div className="container-fluid d-flex flex-wrap gap-2">
-          {[
-            { id: 'overview', icon: 'bi-speedometer2', label: 'Overview' },
-            { id: 'products', icon: 'bi-box-seam', label: 'Products' },
-            { id: 'categories', icon: 'bi-tag', label: 'Categories' },
-            { id: 'orders', icon: 'bi-cart-check', label: 'Orders' },
-            { id: 'users', icon: 'bi-people', label: 'Users' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`btn btn-sm ${
-                activeTab === tab.id ? 'btn-primary' : 'btn-outline-secondary bg-white'
-              }`}
-            >
-              <i className={`bi ${tab.icon} me-1`}></i>
-              [{tab.label}]
-            </button>
-          ))}
-          <Link to="/" className="btn btn-sm btn-outline-dark ms-auto">
-            &larr; Back to Storefront
-          </Link>
-        </div>
-      </nav>
-
-      <main className="container-fluid flex-grow-1 p-3 p-md-4">
-        {/* SECTION 1: Order Fulfillment Management */}
+  // --- TAB CONTENT RENDER HELPERS ---
+   {/* SECTION 1: Order Fulfillment Management */}
+  const renderOrdersSection = () => (
+     
         <section className="card border rounded-3 mb-4 shadow-sm bg-white">
           <div className="card-header bg-white border-bottom py-3">
             <h6 className="fw-bold mb-2 text-dark">Order Fulfillment Management</h6>
@@ -251,8 +205,11 @@ export const AdminDashboardPage: React.FC = () => {
             </table>
           </div>
         </section>
+    );
 
-        {/* SECTION 2: Product Inventory Quick-Edit */}
+ {/* SECTION 2: Product Inventory Quick-Edit */}
+  const renderProductsSection = () => (
+          
         <section className="card border rounded-3 mb-4 shadow-sm bg-white">
           <div className="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h6 className="fw-bold mb-0 text-dark">Product Inventory Quick-Edit</h6>
@@ -347,6 +304,231 @@ export const AdminDashboardPage: React.FC = () => {
             </table>
           </div>
         </section>
+  );
+
+const renderCategorySection = () => (
+    // <div className="card border rounded-3 p-4 bg-white shadow-sm">
+    //   <h5 className="fw-bold mb-3">Category Management</h5>
+    //   <p className="text-muted">Manage product categories and classifications here.</p>
+    // </div>
+    <section className="card border rounded-3 mb-4 shadow-sm bg-white">
+      <div className="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h6 className="fw-bold mb-0 text-dark">Category Management</h6>
+        <div className="d-flex gap-2">
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={() => alert('Open "Add New Category" Modal')}
+          >
+              + Add New Category
+          </button>
+        </div>
+      </div>
+
+      <div className="card-body p-0 table-responsive">
+        <table className="table table-hover align-middle mb-0 small">
+          <thead className="table-light">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Category Name</th>
+              <th scope="col" className="text-end">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {categories.length === 0 ? (
+              <tr>
+                <td colSpan = {3} className="text-center py-4 text-muted">
+                  No categories available in database.
+                </td>
+              </tr>
+            ): (
+              categories.map((cat) => (
+                <tr key={cat.id}>
+                  <td>{cat.id}</td>
+                  <td className="fw-semibold text-dark">{cat.name}</td>
+                  <td className="text-end">
+                    <div className="d-inline-flex gap-1">
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm py-0 px-2"
+                        onClick={() => alert(`Edit Category: ${cat.name}`)}
+                      > 
+                        <i className="bi bi-pencil me-1"></i>[Edit]
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm py-0 px-2"
+                        onClick={() => {
+                          if (window.confirm(`Delete category "${cat.name}"?`)) {
+                            // Dispatch your delete category action here if available
+                            alert(`Delete action for category ID: ${cat.id}`);
+                          }
+                        }}
+                        >
+                          <i className="bi bi-trash me-1"></i>[Delete]
+                        </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+
+      </div>
+
+    </section>
+);
+
+const renderUserSection = () => (
+  // <div className="card border rounded-3 p-4 bg-white shadow-sm">
+  //   <h5 className="fw-bold mb-3">User Management</h5>
+  //   <p className="text-muted">Manage customer roles and account details here.</p>
+  // </div>
+  <section className="card border rounded-3 mb-4 shadow-sm bg-white">
+    <div className="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h6 className="fw-bold mb-0 text-dark">User Management</h6>
+      <div className="d-flex gap-2">
+        <button 
+          className="btn btn-sm btn-primary"
+          onClick = {() => alert('Open "Add New User"  Modal')}
+        >
+          + Add New User
+        </button>
+      </div>
+    </div>
+
+    <div className="card-body p-0 table-responsive">
+      <table className="table table-hover align-middle mb-0 small">
+        <thead className="table-light">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col" className="text-end">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {/* Replace `users` with your actual users state array from Redux if available */}
+          {/* {(!users || users.length === 0) ? (
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-muted">
+                  No users available in database.
+                </td>
+              </tr>
+            ) : (
+              users.map((usr: any) => (
+                <tr key={usr.id}>
+                  <td>{usr.id}</td>
+                  <td className="fw-semibold text-dark">{usr.name}</td>
+                  <td>{usr.email}</td>
+                  <td>
+                    <span className={`badge ${usr.role?.toLowerCase() === 'admin' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-light text-dark border'}`}>
+                      {usr.role || 'Customer'}
+                    </span>
+                  </td>
+                  <td className="text-end">
+                    <div className="d-inline-flex gap-1">
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm py-0 px-2"
+                        onClick={() => alert(`Edit User: ${usr.name}`)}
+                      >
+                        <i className="bi bi-pencil me-1"></i>[Edit]
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm py-0 px-2"
+                        onClick={() => {
+                          if (window.confirm(`Delete user "${usr.name}"?`)) {
+                            alert(`Delete action for user ID: ${usr.id}`);
+                          }
+                        }}
+                      >
+                        <i className="bi bi-trash me-1"></i>[Delete]
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )} */}
+        </tbody>
+
+      </table>
+    </div>
+
+
+  </section>
+);
+
+
+  return (
+    <div className="min-vh-100 bg-light d-flex flex-column font-monospace">
+      {/* Top Console Bar */}
+      <header className="bg-dark text-white border-bottom border-secondary py-2 px-3">
+        <div className="container-fluid d-flex justify-content-between align-items-center">
+          <span className="fw-bold fs-6">MegaMart Admin Console</span>
+          <div className="d-flex align-items-center gap-3 small">
+            <span>
+              <i className="bi bi-person-circle me-1"></i>
+              [{currentUser?.name || 'Admin User'}]
+            </span>
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline-light btn-sm font-monospace py-0 px-2"
+            >
+              [Logout]
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Admin Module Navigation Tabs */}
+      <nav className="bg-secondary bg-opacity-10 border-bottom px-3 py-2">
+        <div className="container-fluid d-flex flex-wrap gap-2">
+          {[
+            { id: 'overview', icon: 'bi-speedometer2', label: 'Overview' },
+            { id: 'products', icon: 'bi-box-seam', label: 'Products' },
+            { id: 'categories', icon: 'bi-tag', label: 'Categories' },
+            { id: 'orders', icon: 'bi-cart-check', label: 'Orders' },
+            { id: 'users', icon: 'bi-people', label: 'Users' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`btn btn-sm ${
+                activeTab === tab.id ? 'btn-primary' : 'btn-outline-secondary bg-white'
+              }`}
+            >
+              <i className={`bi ${tab.icon} me-1`}></i>
+              [{tab.label}]
+            </button>
+          ))}
+          <Link to="/" className="btn btn-sm btn-outline-dark ms-auto">
+            &larr; Back to Storefront
+          </Link>
+        </div>
+      </nav>
+
+      <main className="container-fluid flex-grow-1 p-3 p-md-4">
+          {activeTab === 'overview' && (
+            <>
+              {renderOrdersSection()}
+              {renderProductsSection()}
+            </>
+          )}
+          
+          { activeTab === 'orders' && renderOrdersSection()}
+
+          { activeTab === 'products' && renderProductsSection()}
+
+          { activeTab === 'categories' && renderCategorySection()}
+
+          { activeTab === 'users' && renderUserSection()}
+ 
       </main>
     </div>
   );
