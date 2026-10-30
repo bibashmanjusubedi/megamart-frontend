@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { fetchAllOrders } from '../store/slices/orderSlice';
 import { fetchCategories } from '../store/slices/categorySlice';
 import { fetchProducts } from '../store/slices/productSlice';
+import { fetchAllUsers } from '../store/slices/authSlice';
 
 export const AdminDashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -20,12 +21,14 @@ export const AdminDashboardPage: React.FC = () => {
     dispatch(fetchAllOrders());
     dispatch(fetchProducts());
     dispatch(fetchCategories());
+    dispatch(fetchAllUsers());
 }, [dispatch]);
 
   const { orders } = useAppSelector((state) => state.orders);
   const { products } = useAppSelector((state) => state.products);
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
+  const { users } = useAppSelector((state)=> state.auth);
 
 
 
@@ -413,7 +416,7 @@ const renderUserSection = () => (
 
         <tbody>
           {/* Replace `users` with your actual users state array from Redux if available */}
-          {/* {(!users || users.length === 0) ? (
+          {(!users || users.length === 0) ? (
               <tr>
                 <td colSpan={5} className="text-center py-4 text-muted">
                   No users available in database.
@@ -454,7 +457,7 @@ const renderUserSection = () => (
                   </td>
                 </tr>
               ))
-            )} */}
+            )}
         </tbody>
 
       </table>
