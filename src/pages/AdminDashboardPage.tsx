@@ -39,6 +39,11 @@ export const AdminDashboardPage: React.FC = () => {
   // Order search query
   const [orderSearch, setOrderSearch] = useState<string>('');
 
+
+  // --- Modal Visibility States ---
+  const [showProductModal, setShowProductModal] = useState<boolean>(false);
+  // const [showCategoryModal,setShowCategoryModal] = useState<boolean>(false);
+
     // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
     if(!currentUser || currentUser.role?.toLowerCase() != 'admin'){
@@ -219,7 +224,8 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="d-flex gap-2">
               <button
                 className="btn btn-sm btn-primary"
-                onClick={() => alert('Open "Add New Product" Modal')}
+                // onClick={() => alert('Open "Add New Product" Modal')}
+                onClick = {() => setShowProductModal(true)}
               >
                 + Add New Product
               </button>
@@ -533,6 +539,65 @@ const renderUserSection = () => (
           { activeTab === 'users' && renderUserSection()}
  
       </main>
+
+      {/* ===================== MODALS ===================== */}
+      {/* 1. Add New Product Modal */}
+       {showProductModal && (
+        <div className= "modal show d-block " tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">Add New Product</h5>
+                <button type="button" className="btn-close" onClick={() => setShowProductModal(false)}></button>
+
+              </div>
+              <div className="modal-body">
+                <form>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Product Name</label>
+                    <input type="text" className="form-control w-50"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Category</label>
+                    <input type="text" className="form-control w-50"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Price</label>
+                    <input type="text" className="form-control w-50"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Stock Quantity</label>
+                    <input type="text" className="form-control w-50"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Image URL</label>
+                    <input type="text" className="form-control"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Description</label>
+                    <input type="text" className="form-control"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ">Specifications</label>
+                    <input type="text" className="form-control"/>
+                  </div>
+                  <div className="mb-3">
+                    <label className="col-form-label ss">Secondary Images</label>
+                    <textarea rows= "3" className="form-control"/>
+                  </div>
+                </form>
+              </div>
+
+              <div className="modal-footer">
+                  <button type="button" className="btn btn-primary">Save Product</button>
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+
+              </div>
+            </div>
+        </div>
+      )} 
+
     </div>
   );
 };
