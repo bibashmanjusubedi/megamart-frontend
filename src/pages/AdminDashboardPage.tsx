@@ -297,7 +297,22 @@ export const AdminDashboardPage: React.FC = () => {
                     <td>{catName}</td>
                     <td>₹{prod.price.toLocaleString("en-IN")}</td>
                     <td>
-                      <span
+                      <div className="d-inline-flex gap-4">
+                        <span
+                          className={`badge ${
+                            isLowStock
+                              ? "bg-danger-subtle text-danger"
+                              : "bg-light text-dark border"
+                          }`}
+                        >{prod.stockQuantity}</span>
+                         {isLowStock && (
+                          <span className="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle d-inline-flex align-items-center me-1">
+                            <i className="bi bi-exclamation-triangle me-1"></i>{" "}
+                            [Low Stock]
+                          </span>
+                        )}
+                      </div>
+                      {/* <span
                         className={`badge ${
                           isLowStock
                             ? "bg-danger-subtle text-danger"
@@ -305,16 +320,23 @@ export const AdminDashboardPage: React.FC = () => {
                         }`}
                       >
                         {prod.stockQuantity}
-                      </span>
+                      </span> */}
                     </td>
                     <td className="text-end">
-                      <div className="d-inline-flex gap-1">
-                        {isLowStock && (
+                      <div className="d-inline-flex align-items-center gap-1">
+                        {/* {isLowStock && (
                           <span className="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle d-inline-flex align-items-center me-1">
                             <i className="bi bi-exclamation-triangle me-1"></i>{" "}
                             [Low Stock]
                           </span>
-                        )}
+                        )} */}
+                        <button
+                          type="button"
+                          className="btn btn-outline-info btn-sm py-0 px-2 me-2"
+                          onClick={() => alert(`View Product: ${prod.name}`)}
+                        >
+                          <i className="bi bi-eye me-1"></i>[View]
+                        </button>
                         <button
                           type="button"
                           className="btn btn-outline-primary btn-sm py-0 px-2"
@@ -478,6 +500,13 @@ export const AdminDashboardPage: React.FC = () => {
                   </td>
                   <td className="text-end">
                     <div className="d-inline-flex gap-1">
+                       <button
+                          type="button"
+                          className="btn btn-outline-info btn-sm py-0 px-2 me-2"
+                          onClick={() => alert(`View User: ${usr.name}`)}
+                        >
+                          <i className="bi bi-eye me-1"></i>[View]
+                        </button>
                       <button
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
@@ -606,10 +635,7 @@ export const AdminDashboardPage: React.FC = () => {
                       {/* Dynamically render categories from Redux state */}
                       {categories &&
                         categories.map((category) => (
-                          <option
-                            key={category.id}
-                            value={category.id}
-                          >
+                          <option key={category.id} value={category.id}>
                             {category.name}
                           </option>
                         ))}
