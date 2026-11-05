@@ -44,6 +44,10 @@ export const AdminDashboardPage: React.FC = () => {
     number | null
   >(null);
 
+  const [selectedProductToEdit, setSelectedProductToEdit] = useState<
+    number | null
+  >(null);
+
   // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
     if (!currentUser || currentUser.role?.toLowerCase() != "admin") {
@@ -348,7 +352,8 @@ export const AdminDashboardPage: React.FC = () => {
                         <button
                           type="button"
                           className="btn btn-outline-primary btn-sm py-0 px-2"
-                          onClick={() => alert(`Edit Product: ${prod.name}`)}
+                          // onClick={() => alert(`Edit Product: ${prod.name}`)}
+                          onClick={() => setSelectedProductToEdit(prod.id)}
                         >
                           <i className="bi bi-pencil me-1"></i>[Edit]
                         </button>
@@ -747,6 +752,252 @@ export const AdminDashboardPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+      {selectedProductToEdit !== null &&
+        (() => {
+          const product = products.find((p) => p.id === selectedProductToEdit);
+
+          if (!product) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Edit Product</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => setSelectedProductToEdit(null)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    <form>
+                      <div className="mb-3">
+                        <label className="col-form-label">Product Name</label>
+                        <input
+                          type="text"
+                          className="form-control w-50"
+                          defaultValue={product.name}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label">Category</label>
+                        <select
+                          className="form-select w-50"
+                          defaultValue={product.categoryId}
+                        >
+                          <option value="" disabled>
+                            Select a Category
+                          </option>
+                          {categories &&
+                            categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label className="col-form-label">Price</label>
+                        <input
+                          type="text"
+                          className="form-control w-50"
+                          defaultValue={product.price}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label">Stock Quantity</label>
+                        <input
+                          type="text"
+                          className="form-control w-50"
+                          defaultValue={product.stockQuantity}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label">Description</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          defaultValue={product.description}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label">Specifications</label>
+                        <div className="ps-3 d-flex flex-column gap-2">
+                          <div className="mb-2 d-flex align-items-center gap-2">
+                            <label
+                              className="col-form-label small text-muted"
+                              style={{ width: "80px", flexShrink: 0 }}
+                            >
+                              Model:
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              defaultValue={product.specifications.model}
+                            />
+                          </div>
+                          <div className="mb-2 d-flex align-items-center gap-2">
+                            <label
+                              className="col-form-label small text-muted"
+                              style={{ width: "80px", flexShrink: 0 }}
+                            >
+                              Warranty:
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              defaultValue={product.specifications.warranty}
+                            />
+                          </div>
+
+                          <div className="mb-2 d-flex align-items-center gap-2">
+                            <label
+                              className="col-form-label small text-muted"
+                              style={{ width: "80px", flexShrink: 0 }}
+                            >
+                              Delivery:
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              defaultValue={product.specifications.delivery}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Primary Image Section */}
+                      <div className="mb-3">
+                        <label className="col-form-label">Primary Image</label>
+
+                        <div className="text-center">
+                          {product.imageUrl ? (
+                            <img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              style={{
+                                maxHeight: "300px",
+                                objectFit: "cover",
+                                width: "100%",
+                              }}
+                            />
+                          ) : (
+                            <p className="text-muted small">
+                              No primary image available
+                            </p>
+                          )}
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          <label
+                            className="col-form-label small"
+                            style={{ width: "160px", flexShrink: 0 }}
+                          >
+                            <strong>Primary Image URL:</strong>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control mt-2"
+                            defaultValue={product.imageUrl}
+                            placeholder="Update Primary Image URL"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Secondary Images Section */}
+                      <div className="mb-3">
+                        <label className="col-form-label d-block mb-1">
+                          Secondary Images
+                        </label>
+                        <div>
+                          {product.secondaryImages &&
+                          product.secondaryImages.length > 0 ? (
+                            <div className="d-flex flex-column gap-3 mb-2">
+                              {product.secondaryImages.map(
+                                (secondaryImage: any, index: number) => {
+                                  const imgUrl =
+                                    typeof secondaryImage === "string"
+                                      ? secondaryImage
+                                      : secondaryImage?.imageUrl;
+
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="d-flex align-items-center gap-3 p-2"
+                                    >
+                                      {/* Thumbnail Preview */}
+                                      <img
+                                        src={imgUrl}
+                                        alt={`${product.name} Secondary ${index + 1}`}
+                                        className="flex-shrink-0"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+
+                                      {/* Editable URL Input */}
+                                      <div className="flex-grow-1">
+                                        <label className="form-label small text-muted mb-1">
+                                          Secondary Image #{index + 1} URL
+                                        </label>
+                                        <input
+                                          type="text"
+                                          className="form-control form-control-sm"
+                                          defaultValue={imgUrl || ""}
+                                          placeholder="Enter secondary image URL"
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                },
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-muted small">
+                              No secondary images available
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        alert(`Updated changes for: ${product.name}`);
+                        setSelectedProductToEdit(null);
+                      }}
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setSelectedProductToEdit(null)}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </div>
