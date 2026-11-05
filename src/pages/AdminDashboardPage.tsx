@@ -39,6 +39,11 @@ export const AdminDashboardPage: React.FC = () => {
   const [showProductModal, setShowProductModal] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
 
+  // --- New State for Viewing Product Details ---
+  const [selectedProductToView, setSelectedProductToView] = useState<
+    number | null
+  >(null);
+
   // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
     if (!currentUser || currentUser.role?.toLowerCase() != "admin") {
@@ -304,8 +309,10 @@ export const AdminDashboardPage: React.FC = () => {
                               ? "bg-danger-subtle text-danger"
                               : "bg-light text-dark border"
                           }`}
-                        >{prod.stockQuantity}</span>
-                         {isLowStock && (
+                        >
+                          {prod.stockQuantity}
+                        </span>
+                        {isLowStock && (
                           <span className="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle d-inline-flex align-items-center me-1">
                             <i className="bi bi-exclamation-triangle me-1"></i>{" "}
                             [Low Stock]
@@ -333,7 +340,8 @@ export const AdminDashboardPage: React.FC = () => {
                         <button
                           type="button"
                           className="btn btn-outline-info btn-sm py-0 px-2 me-2"
-                          onClick={() => alert(`View Product: ${prod.name}`)}
+                          // onClick={() => alert(`View Product: ${prod.name}`)}
+                          onClick={() => setSelectedProductToView(prod.id)}
                         >
                           <i className="bi bi-eye me-1"></i>[View]
                         </button>
@@ -500,13 +508,13 @@ export const AdminDashboardPage: React.FC = () => {
                   </td>
                   <td className="text-end">
                     <div className="d-inline-flex gap-1">
-                       <button
-                          type="button"
-                          className="btn btn-outline-info btn-sm py-0 px-2 me-2"
-                          onClick={() => alert(`View User: ${usr.name}`)}
-                        >
-                          <i className="bi bi-eye me-1"></i>[View]
-                        </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-info btn-sm py-0 px-2 me-2"
+                        onClick={() => alert(`View User: ${usr.name}`)}
+                      >
+                        <i className="bi bi-eye me-1"></i>[View]
+                      </button>
                       <button
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
@@ -602,6 +610,150 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === "users" && renderUserSection()}
       </main>
 
+      {/* 0. View Product Details Modal */}
+      {selectedProductToView !== null &&
+        (() => {
+          const product = products.find((p) => p.id === selectedProductToView);
+          if (!product) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Product Details</h5>
+                    <button
+                      onClick={() => setSelectedProductToView(null)}
+                      className="btn-close"
+                    ></button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small mb-0">
+                        Product ID:
+                      </label>
+                      <span className="text-dark">{product.id}</span>
+                    </div>
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small">
+                        Product Name
+                      </label>
+                      <span className="text-dark">{product.name}</span>
+                    </div>
+
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small">
+                        Category:{" "}
+                      </label>
+                      <span className="text-dark">
+                        {categories.find((c) => c.id === product.categoryId)
+                          ?.name || "Uncategorized"}
+                      </span>
+                    </div>
+
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small">Price:</label>
+                      <span className="text-dark">
+                        ₹{product.price.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small">
+                        Stock Quantity:
+                      </label>
+                      <span className="text-dark">{product.stockQuantity}</span>
+                    </div>
+
+                    <div className="mb-2 d-flex align-items-center gap-2">
+                      <label className="fw-bold text-muted small">
+                        Description:
+                      </label>
+                      <span className="text-dark">{product.description}</span>
+                    </div>
+
+                    <div className="mb-2">
+                      <label className="fw-bold text-muted small d-block mb-1">
+                        Specifications:
+                      </label>
+                      <ul className="text-dark list-unstyled ms-4 mb-0 d-flex flex-column gap-1">
+                        <li>
+                          <strong>Model:</strong>
+                          {product.specifications?.model}
+                        </li>
+                        <li>
+                          <strong>Delivery:</strong>
+                          {product.specifications?.delivery}
+                        </li>
+                        <li>
+                          <strong>Warranty:</strong>
+                          {product.specifications?.warranty}
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="mb-2">
+                      <label className="fw-bold text-muted small">
+                        Primary Image:
+                      </label>
+                      <div className="text-center">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            style={{
+                              maxHeight: "300px",
+                              objectFit: "cover",
+                              width: "100%",
+                            }}
+                          />
+                        ) : (
+                          <p>No image available</p>
+                        )}
+                      </div>
+
+                      <div className="mb-2 mt-3">
+                        <label className="fw-bold text-muted small">
+                          Secondary Images:
+                        </label>
+                        <div>
+                          {product.secondaryImages &&
+                          product.secondaryImages.length > 0 ? (
+                            <div className="d-flex flex-row flex-wrap gap-2">
+                              {product.secondaryImages.map(
+                                (secondaryImage, index) => (
+                                  <img
+                                    key={index}
+                                    src={secondaryImage.imageUrl}
+                                    alt={`${product.name} Secondary ${index + 1}`}
+                                    style={{
+                                      width: "150px",
+                                      height: "150px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                ),
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-muted small">
+                              No secondary images available
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
       {/* ===================== MODALS ===================== */}
       {/* 1. Add New Product Modal */}
       {showProductModal && (
@@ -669,7 +821,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <label className="col-form-label ss">
                       Secondary Images
                     </label>
-                    <textarea rows="3" className="form-control" />
+                    <textarea rows={3} className="form-control" />
                   </div>
                 </form>
               </div>
