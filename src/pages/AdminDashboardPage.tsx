@@ -48,6 +48,10 @@ export const AdminDashboardPage: React.FC = () => {
     number | null
   >(null);
 
+  const [selectedCategoryToEdit, setSelectedCategoryToEdit] = useState<
+    number | null
+  >(null);
+
   // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
     if (!currentUser || currentUser.role?.toLowerCase() != "admin") {
@@ -428,7 +432,8 @@ export const AdminDashboardPage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
-                        onClick={() => alert(`Edit Category: ${cat.name}`)}
+                        // onClick={() => alert(`Edit Category: ${cat.name}`)}
+                        onClick={() => setSelectedCategoryToEdit(cat.id)}
                       >
                         <i className="bi bi-pencil me-1"></i>[Edit]
                       </button>
@@ -1136,6 +1141,72 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {selectedCategoryToEdit !== null &&
+        (() => {
+          const category = categories.find(
+            (c) => c.id === selectedCategoryToEdit,
+          );
+          if (!category) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5" }}
+            >
+              <div className="modal-dialog modal-dialog-centered modal-sm">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Edit Category</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => setSelectedCategoryToEdit(null)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    <form>
+                      <div className="mb-3">
+                        <label className="col-form-label small text-muted fw-bold">
+                          Category Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          defaultValue={category.name}
+                          placeholder="Enter category name"
+                        />
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        // TODO: Dispatch update category action here
+                        alert(`Updated category: ${category.name}`);
+                        setSelectedCategoryToEdit(null);
+                      }}
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setSelectedCategoryToEdit(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 };
