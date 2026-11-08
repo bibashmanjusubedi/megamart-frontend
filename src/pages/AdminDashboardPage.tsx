@@ -523,7 +523,7 @@ export const AdminDashboardPage: React.FC = () => {
                         className="btn btn-outline-info btn-sm py-0 px-2 me-2"
                         onClick={() => alert(`View User: ${usr.name}`)}
                       >
-                        <i className="bi bi-eye me-1"></i>[View]
+                      <i className="bi bi-eye me-1"></i>[View]
                       </button>
                       <button
                         type="button"
