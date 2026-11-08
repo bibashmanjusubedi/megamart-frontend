@@ -7,7 +7,7 @@ import { logout } from "../store/slices/authSlice";
 import type { Order } from "../types";
 import { useEffect } from "react";
 import { fetchAllOrders } from "../store/slices/orderSlice";
-import { fetchCategories } from "../store/slices/categorySlice";
+import { fetchCategories, createCategory } from "../store/slices/categorySlice";
 import { fetchProducts } from "../store/slices/productSlice";
 import { fetchAllUsers } from "../store/slices/authSlice";
 
@@ -27,6 +27,8 @@ export const AdminDashboardPage: React.FC = () => {
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { users } = useAppSelector((state) => state.auth);
+
+  const [newCategoryName, setNewCategoryName] = useState<string>("");
 
   // Active navigation tab
   const [activeTab, setActiveTab] = useState<
@@ -1142,9 +1144,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Secondary Images Section (#1, #2, #3) */}
                   <div className="mb-3">
-                    <label className="col-form-label">
-                      Secondary Images
-                    </label>
+                    <label className="col-form-label">Secondary Images</label>
 
                     <div className="ms-3">
                       {/* Secondary Image #1 */}
@@ -1216,7 +1216,7 @@ export const AdminDashboardPage: React.FC = () => {
       {/* 1. Add New Product Modal */}
       {showCategoryModal && (
         <div
-          className="modal show d-block "
+          className="modal show d-block"
           tabIndex={-1}
           style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
@@ -1227,30 +1227,60 @@ export const AdminDashboardPage: React.FC = () => {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={() => setShowCategoryModal(false)}
+                  onClick={() => {
+                    setShowCategoryModal(false);
+                    setNewCategoryName("");
+                  }}
                 ></button>
               </div>
-              <div className="modal-body">
-                <form>
-                  <div className="mb-3">
-                    <label className="col-form-label ">Category Name</label>
-                    <input type="text" className="form-control w-50" />
-                  </div>
-                </form>
-              </div>
 
-              <div className="modal-footer">
-                <button type="button" className="btn btn-primary">
-                  Save Category
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </button>
-              </div>
+              {/* Form wrapping the entire body and footer */}
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!newCategoryName.trim()) return;
+
+                  try {
+                    await dispatch(
+                      createCategory({ name: newCategoryName.trim() }),
+                    ).unwrap();
+                    setNewCategoryName("");
+                    setShowCategoryModal(false);
+                  } catch (error) {
+                    console.error("Failed to create category:", error);
+                  }
+                }}
+              >
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="col-form-label">Category Name</label>
+                    <input
+                      type="text"
+                      className="form-control w-50"
+                      placeholder="Enter category name"
+                      value={newCategoryName || ""}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button type="submit" className="btn btn-primary btn-sm">
+                    Save Category
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      setShowCategoryModal(false);
+                      setNewCategoryName("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

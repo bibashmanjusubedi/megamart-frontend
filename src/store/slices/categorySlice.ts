@@ -45,6 +45,20 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
+// 1. Add the createCategory async thunk
+export const createCategory = createAsyncThunk(
+  'categories/createCategory',
+  async(newCategory:{ name:string }, thunkAPI) => {
+    try{
+      const response = await api.post<Category>('/Categories', newCategory);
+      return response.data;
+    } catch(error: any){
+      const message = error.response?.data?.message || error.message || 'Failed to create category';
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 interface CategoryState {
   categories: Category[];
   isLoading: boolean;
@@ -79,7 +93,20 @@ const categorySlice = createSlice({
       .addCase(fetchCategories.rejected,(state,action) => {
         state.isLoading = false;
         state.error = action.payload as string || 'Failed to load categories';
-      });
+      })
+      //Create Category
+      .addCase(createCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createCategory.fulfilled,(state, action) => {
+        state.isLoading = false;
+        state.categories.push(action.payload);// Instantly adds the new category to Redux state
+      })
+      .addCase(createCategory.rejected, (state,action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string ) || 'failed to create category';
+      })
   },
 });
 
