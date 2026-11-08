@@ -52,6 +52,10 @@ export const AdminDashboardPage: React.FC = () => {
     number | null
   >(null);
 
+  const [selectedUserToEdit, setSelectedUserToEdit] = useState<number | null>(
+    null,
+  );
+
   // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
     if (!currentUser || currentUser.role?.toLowerCase() != "admin") {
@@ -523,12 +527,13 @@ export const AdminDashboardPage: React.FC = () => {
                         className="btn btn-outline-info btn-sm py-0 px-2 me-2"
                         onClick={() => alert(`View User: ${usr.name}`)}
                       >
-                      <i className="bi bi-eye me-1"></i>[View]
+                        <i className="bi bi-eye me-1"></i>[View]
                       </button>
                       <button
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
-                        onClick={() => alert(`Edit User: ${usr.name}`)}
+                        // onClick={() => alert(`Edit User: ${usr.name}`)}
+                        onClick={() => setSelectedUserToEdit(usr.id)}
                       >
                         <i className="bi bi-pencil me-1"></i>[Edit]
                       </button>
@@ -1207,6 +1212,101 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           );
         })()}
+
+      {selectedUserToEdit !== null &&
+        (() => {
+          const user = users.find((u) => u.id === selectedUserToEdit);
+
+          if (!user) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered modal-sm">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Edit User</h5>
+
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => setSelectedUserToEdit(null)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    <form>
+                      <div className="mb-3">
+                        <label className="col-form-label small text-muted fw-bold">
+                          Username
+                        </label>
+
+                        <input
+                          type="text"
+                          className="form-control bg-light"
+                          value={user.name}
+                          disabled
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label small text-muted fw-bold">
+                          Email
+                        </label>
+
+                        <input
+                          type="email"
+                          className="form-control bg-light"
+                          value={user.email}
+                          disabled
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="col-form-label small text-muted fw-bold">
+                          Role
+                        </label>
+
+                        <select
+                          className="form-select"
+                          defaultValue={user.role}
+                        >
+                          <option value="Admin">Admin</option>
+                          <option value="Customer">Customer</option>
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        alert(`Updated role for: ${user.name}`);
+                        setSelectedUserToEdit(null);
+                      }}
+                    >
+                      Save Changes
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setSelectedUserToEdit(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
     </div>
   );
 };
