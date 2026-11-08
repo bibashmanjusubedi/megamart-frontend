@@ -1066,23 +1066,132 @@ export const AdminDashboardPage: React.FC = () => {
                     <label className="col-form-label ">Stock Quantity</label>
                     <input type="text" className="form-control w-50" />
                   </div>
-                  <div className="mb-3">
-                    <label className="col-form-label ">Image URL</label>
-                    <input type="text" className="form-control" />
-                  </div>
+
                   <div className="mb-3">
                     <label className="col-form-label ">Description</label>
                     <input type="text" className="form-control" />
                   </div>
+
+                  {/* Specifications Section (Model, Warranty, Delivery) */}
                   <div className="mb-3">
+                    <label className="col-form-label">Specifications</label>
+
+                    <div className="ms-3">
+                      {/* Model */}
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "80px", flexShrink: 0 }}
+                        >
+                          Model:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter model"
+                        />
+                      </div>
+
+                      {/* Warranty */}
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "80px", flexShrink: 0 }}
+                        >
+                          Warranty:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter warranty details"
+                        />
+                      </div>
+
+                      {/* Delivery */}
+                      <div className="d-flex align-items-center gap-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "80px", flexShrink: 0 }}
+                        >
+                          Delivery:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter delivery info"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {/* <div className="mb-3">
                     <label className="col-form-label ">Specifications</label>
                     <input type="text" className="form-control" />
-                  </div>
-                  <div className="mb-3">
+                  </div> */}
+
+                  {/* <div className="mb-3">
                     <label className="col-form-label ss">
                       Secondary Images
                     </label>
                     <textarea rows={3} className="form-control" />
+                  </div> */}
+
+                  <div className="mb-3">
+                    <label className="col-form-label ">Primary Image URL</label>
+                    <input type="text" className="form-control" />
+                  </div>
+
+                  {/* Secondary Images Section (#1, #2, #3) */}
+                  <div className="mb-3">
+                    <label className="col-form-label">
+                      Secondary Images
+                    </label>
+
+                    <div className="ms-3">
+                      {/* Secondary Image #1 */}
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "160px", flexShrink: 0 }}
+                        >
+                          Secondary Image #1 URL:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter secondary image #1 URL"
+                        />
+                      </div>
+
+                      {/* Secondary Image #2 */}
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "160px", flexShrink: 0 }}
+                        >
+                          Secondary Image #2 URL:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter secondary image #2 URL"
+                        />
+                      </div>
+
+                      {/* Secondary Image #3 */}
+                      <div className="d-flex align-items-center gap-2">
+                        <label
+                          className="col-form-label small text-muted"
+                          style={{ width: "160px", flexShrink: 0 }}
+                        >
+                          Secondary Image #3 URL:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter secondary image #3 URL"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -1306,7 +1415,6 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           );
         })()}
-
     </div>
   );
 };
