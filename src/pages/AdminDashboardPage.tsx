@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { updateOrderStatus } from "../store/slices/orderSlice";
@@ -7,7 +7,11 @@ import { logout } from "../store/slices/authSlice";
 import type { Order } from "../types";
 import { useEffect } from "react";
 import { fetchAllOrders } from "../store/slices/orderSlice";
-import { fetchCategories, createCategory } from "../store/slices/categorySlice";
+import {
+  fetchCategories,
+  createCategory,
+  updateCategory,
+} from "../store/slices/categorySlice";
 import { fetchProducts } from "../store/slices/productSlice";
 import { fetchAllUsers } from "../store/slices/authSlice";
 
@@ -57,6 +61,9 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedUserToEdit, setSelectedUserToEdit] = useState<number | null>(
     null,
   );
+
+  // Create a ref for the input element
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Route Guard: Redirect non-admins or guests away from the admin panel
   useEffect(() => {
@@ -1297,7 +1304,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div
               className="modal show d-block"
               tabIndex={-1}
-              style={{ backgroundColor: "rgba(0,0,0,0.5" }}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             >
               <div className="modal-dialog modal-dialog-centered modal-sm">
                 <div className="modal-content">
@@ -1311,7 +1318,22 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
 
                   <div className="modal-body">
-                    <form>
+                    {/* 1. Put your submit logic right here in onSubmit */}
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault(); // Prevents page reload & handles HTML validation
+                        const updatedName = inputRef.current?.value.trim();
+                        if (updatedName) {
+                          dispatch(
+                            updateCategory({
+                              id: category.id,
+                              name: updatedName,
+                            }),
+                          );
+                          setSelectedCategoryToEdit(null);
+                        }
+                      }}
+                    >
                       <div className="mb-3">
                         <label className="col-form-label small text-muted fw-bold">
                           Category Name
@@ -1321,30 +1343,27 @@ export const AdminDashboardPage: React.FC = () => {
                           className="form-control"
                           defaultValue={category.name}
                           placeholder="Enter category name"
+                          ref={inputRef}
+                          required
                         />
                       </div>
-                    </form>
-                  </div>
 
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        // TODO: Dispatch update category action here
-                        alert(`Updated category: ${category.name}`);
-                        setSelectedCategoryToEdit(null);
-                      }}
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => setSelectedCategoryToEdit(null)}
-                    >
-                      Cancel
-                    </button>
+                      <div className="modal-footer border-0 px-0 pb-0">
+                        <button
+                          type="submit" // 2. Triggers HTML5 validation & form onSubmit when clicked
+                          className="btn btn-primary btn-sm"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setSelectedCategoryToEdit(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>

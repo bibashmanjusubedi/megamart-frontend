@@ -59,6 +59,25 @@ export const createCategory = createAsyncThunk(
   }
 );
 
+// updateCategory async thunk
+// Explicitly pass <Category, Category> (Fulfilled Return Type, Argument Type)
+export const updateCategory = createAsyncThunk<Category, Category>(
+  'categories/updateCategory',
+  async (category, thunkAPI) => {
+    try {
+      // const response = await api.put<Category>(`/Categories/${category.id}`, { name: category.name });
+      // return response.data; 
+      await api.put(`/Categories/${category.id}`, { name: category.name });
+      
+      // Explicitly return the category object so Redux can update the UI
+      return category;
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || 'Failed to update category';
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 interface CategoryState {
   categories: Category[];
   isLoading: boolean;
@@ -107,6 +126,23 @@ const categorySlice = createSlice({
         state.isLoading = false;
         state.error = (action.payload as string ) || 'failed to create category';
       })
+      // Update Category reducer
+      .addCase(updateCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateCategory.fulfilled,(state,action) => {
+        state.isLoading = false;
+        const index = state.categories.findIndex((c) => c.id === action.payload.id);
+        if (index !== -1){
+          state.categories[index] = action.payload;
+        }
+      })
+      .addCase(updateCategory.rejected,(state,action)=> {
+        state.isLoading = false;
+        state.error = (action.payload as string) || 'Failed to update category';
+      });
+
   },
 });
 
