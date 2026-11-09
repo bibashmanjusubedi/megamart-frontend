@@ -11,6 +11,7 @@ import {
   fetchCategories,
   createCategory,
   updateCategory,
+  deleteCategory,
 } from "../store/slices/categorySlice";
 import { fetchProducts } from "../store/slices/productSlice";
 import { fetchAllUsers } from "../store/slices/authSlice";
@@ -61,6 +62,10 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedUserToEdit, setSelectedUserToEdit] = useState<number | null>(
     null,
   );
+
+  const [selectedCategoryToDelete, setSelectedCategoryToDelete] = useState<
+    number | string | null
+  >(null);
 
   // Create a ref for the input element
   const inputRef = useRef<HTMLInputElement>(null);
@@ -454,14 +459,15 @@ export const AdminDashboardPage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-danger btn-sm py-0 px-2"
-                        onClick={() => {
-                          if (
-                            window.confirm(`Delete category "${cat.name}"?`)
-                          ) {
-                            // Dispatch your delete category action here if available
-                            alert(`Delete action for category ID: ${cat.id}`);
-                          }
-                        }}
+                        // onClick={() => {
+                        //   if (
+                        //     window.confirm(`Delete category "${cat.name}"?`)
+                        //   ) {
+                        //     // Dispatch your delete category action here if available
+                        //     alert(`Delete action for category ID: ${cat.id}`);
+                        //   }
+                        // }}
+                        onClick={() => setSelectedCategoryToDelete(cat.id)} // Triggers custom popup modal
                       >
                         <i className="bi bi-trash me-1"></i>[Delete]
                       </button>
@@ -1455,6 +1461,67 @@ export const AdminDashboardPage: React.FC = () => {
                       type="button"
                       className="btn btn-secondary btn-sm"
                       onClick={() => setSelectedUserToEdit(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
+      {selectedCategoryToDelete !== null &&
+        (() => {
+          const category = categories.find(
+            (c) => c.id === selectedCategoryToDelete,
+          );
+          if (!category) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered modal-sm">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold text-danger">
+                      Confirm Delete
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => setSelectedCategoryToDelete(null)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    <p className="small text-muted mb-0">
+                      Are you sure you want to delete the category{" "}
+                      <strong className="text-dark">{category.name}</strong>?
+                      This action cannot be undone.
+                    </p>
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => {
+                        dispatch(deleteCategory(category.id));
+                        setSelectedCategoryToDelete(null);
+                      }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setSelectedCategoryToDelete(null)}
                     >
                       Cancel
                     </button>

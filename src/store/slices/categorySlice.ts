@@ -78,6 +78,21 @@ export const updateCategory = createAsyncThunk<Category, Category>(
   }
 );
 
+// Add deleteCategory thunk]
+export const deleteCategory = createAsyncThunk<number|string,number|string>(
+  'categories/deleteCategory',
+  async (id, thunkAPI ) => {
+    try{
+      await api.delete(`/Categories/${id}`);
+      return id;
+    } catch(error: any){
+      const message = error.response?.data?.message || error.message || ' Failed to delete categories';
+      return thunkAPI.rejectWithValue(message);
+    }
+
+  }
+)
+
 interface CategoryState {
   categories: Category[];
   isLoading: boolean;
@@ -141,6 +156,20 @@ const categorySlice = createSlice({
       .addCase(updateCategory.rejected,(state,action)=> {
         state.isLoading = false;
         state.error = (action.payload as string) || 'Failed to update category';
+      })
+      //Delete Category Reducer
+      .addCase(deleteCategory.pending,(state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteCategory.fulfilled,(state,action) => {
+        state.isLoading = false;
+        // Remove the deleted category from the array
+        state.categories = state.categories.filter((c) => c.id !== action.payload);
+      })
+      .addCase(deleteCategory.rejected, (state,action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string) || 'Failed to delete category';
       });
 
   },
