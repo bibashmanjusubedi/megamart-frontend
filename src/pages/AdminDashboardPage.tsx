@@ -67,6 +67,9 @@ export const AdminDashboardPage: React.FC = () => {
     number | string | null
   >(null);
 
+  // 1. Add a state variable for tracking deletion errors in your component
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   // Create a ref for the input element
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -1471,9 +1474,7 @@ export const AdminDashboardPage: React.FC = () => {
           );
         })()}
 
-      {/* Delete Confirmation Modal */}
-      {/* Delete Confirmation Modal */}
-      {selectedCategoryToDelete !== null &&
+      {/*{selectedCategoryToDelete !== null &&
         (() => {
           const category = categories.find(
             (c) => c.id === selectedCategoryToDelete,
@@ -1495,11 +1496,24 @@ export const AdminDashboardPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn-close"
-                      onClick={() => setSelectedCategoryToDelete(null)}
+                      onClick={() => {
+                        setSelectedCategoryToDelete(null);
+                        setDeleteError(null); // Clear error on close
+                      }}
                     ></button>
                   </div>
 
                   <div className="modal-body">
+            
+                    {deleteError && (
+                      <div
+                        className="alert alert-danger py-2 px-3 small mb-3"
+                        role="alert"
+                      >
+                        {deleteError}
+                      </div>
+                    )}
+
                     <p className="small text-muted mb-0">
                       Are you sure you want to delete the category{" "}
                       <strong className="text-dark">{category.name}</strong>?
@@ -1511,9 +1525,18 @@ export const AdminDashboardPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={() => {
-                        dispatch(deleteCategory(category.id));
-                        setSelectedCategoryToDelete(null);
+                      onClick={async () => {
+                        setDeleteError(null);
+
+                          await dispatch(deleteCategory(category.id)).unwrap();
+
+                          setSelectedCategoryToDelete(null);
+                        } catch (errMessage: any) {
+          
+                          setDeleteError(
+                            errMessage || "Failed to delete category",
+                          );
+                        }
                       }}
                     >
                       Delete
@@ -1521,10 +1544,126 @@ export const AdminDashboardPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
-                      onClick={() => setSelectedCategoryToDelete(null)}
+                      onClick={() => {
+                        setSelectedCategoryToDelete(null);
+                        setDeleteError(null); 
+                      }}
                     >
                       Cancel
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()} */}
+
+      {selectedCategoryToDelete !== null &&
+        (() => {
+          const category = categories.find(
+            (c) => c.id === selectedCategoryToDelete,
+          );
+          if (!category) return null;
+
+          return (
+            <div
+              className="modal show d-block"
+              tabIndex={-1}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered modal-sm">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5
+                      className={`modal-title fw-bold ${deleteError ? "text-danger" : ""}`}
+                    >
+                      {deleteError
+                        ? "Cannot Delete Category"
+                        : "Confirm Delete"}
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => {
+                        setSelectedCategoryToDelete(null);
+                        setDeleteError(null);
+                      }}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    {/* Show error alert if an error occurred */}
+                    {deleteError ? (
+                      <div>
+                        <div
+                          className="alert alert-danger py-2 px-3 small mb-3"
+                          role="alert"
+                        >
+                          {deleteError}
+                        </div>
+                        <p className="small text-muted mb-0">
+                          To delete{" "}
+                          <strong className="text-dark">{category.name}</strong>
+                          , please first remove or reassign all products
+                          associated with it.
+                        </p>
+                      </div>
+                    ) : (
+                      /* Standard confirmation text shown normally */
+                      <p className="small text-muted mb-0">
+                        Are you sure you want to delete the category{" "}
+                        <strong className="text-dark">{category.name}</strong>?
+                        This action cannot be undone.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="modal-footer">
+                    {/* If there is an error, hide the Delete button completely and just show Close */}
+                    {!deleteError ? (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm"
+                          onClick={async () => {
+                            setDeleteError(null);
+                            try {
+                              await dispatch(
+                                deleteCategory(category.id),
+                              ).unwrap();
+                              setSelectedCategoryToDelete(null);
+                            } catch (errMessage: any) {
+                              setDeleteError(
+                                errMessage || "Failed to delete category",
+                              );
+                            }
+                          }}
+                        >
+                          Delete
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setSelectedCategoryToDelete(null);
+                            setDeleteError(null);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          setSelectedCategoryToDelete(null);
+                          setDeleteError(null);
+                        }}
+                      >
+                        Close
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
