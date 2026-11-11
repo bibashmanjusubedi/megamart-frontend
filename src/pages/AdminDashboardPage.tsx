@@ -15,10 +15,13 @@ import {
 } from "../store/slices/categorySlice";
 import { fetchProducts } from "../store/slices/productSlice";
 import { fetchAllUsers } from "../store/slices/authSlice";
+import { updateUserRole } from "../store/slices/authSlice";
 
 export const AdminDashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const[updatedRole,setUpdatedRole] = useState("");
 
   useEffect(() => {
     dispatch(fetchAllOrders());
@@ -551,7 +554,7 @@ export const AdminDashboardPage: React.FC = () => {
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
                         // onClick={() => alert(`Edit User: ${usr.name}`)}
-                        onClick={() => setSelectedUserToEdit(usr.id)}
+                        onClick={() => { setSelectedUserToEdit(usr.id); setUpdatedRole(usr.role);}}
                       >
                         <i className="bi bi-pencil me-1"></i>[Edit]
                       </button>
@@ -1440,6 +1443,7 @@ export const AdminDashboardPage: React.FC = () => {
                         <select
                           className="form-select"
                           defaultValue={user.role}
+                          onChange={(e) => setUpdatedRole(e.target.value)}
                         >
                           <option value="Admin">Admin</option>
                           <option value="Customer">Customer</option>
@@ -1452,9 +1456,24 @@ export const AdminDashboardPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        alert(`Updated role for: ${user.name}`);
-                        setSelectedUserToEdit(null);
+                      // onClick={() => {
+                      //   alert(`Updated role for: ${user.name}`);
+                      //   setSelectedUserToEdit(null);
+                      // }}
+                      onClick = {async () => {
+                        try{
+                          const roleToSend = updatedRole || user.role;
+
+                          // Dispatch the async thunk
+                          await dispatch(updateUserRole({ id:user.id,role:roleToSend })).unwrap();
+
+                          alert(`Sucessfully updated role for ${user.name}`);
+                          setSelectedUserToEdit(null);
+                          setUpdatedRole("");// Reset state
+                        } catch(error){
+                          console.error("Error updating role:", error);
+                          alert("An error occured while updating the role")
+                        }
                       }}
                     >
                       Save Changes
