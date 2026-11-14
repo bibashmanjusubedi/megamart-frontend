@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { updateOrderStatus } from "../store/slices/orderSlice";
-import { deleteProduct } from "../store/slices/productSlice";
+import { deleteProduct, addProduct } from "../store/slices/productSlice";
 import { logout } from "../store/slices/authSlice";
 import type { Order } from "../types";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export const AdminDashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const[updatedRole,setUpdatedRole] = useState("");
+  const [updatedRole, setUpdatedRole] = useState("");
 
   useEffect(() => {
     dispatch(fetchAllOrders());
@@ -31,7 +31,7 @@ export const AdminDashboardPage: React.FC = () => {
   }, [dispatch]);
 
   const { orders } = useAppSelector((state) => state.orders);
-  const { products } = useAppSelector((state) => state.products);
+  const { products, loading:productLoading } = useAppSelector((state) => state.products);
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { users } = useAppSelector((state) => state.auth);
@@ -48,6 +48,88 @@ export const AdminDashboardPage: React.FC = () => {
   // --- Modal Visibility States ---
   const [showProductModal, setShowProductModal] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+
+  // --- Add Product Form State ---
+  const [productForm, setProductForm] = useState({
+    name: "",
+    price: "",
+    stockQuantity: "",
+    imageUrl: "",
+    imagePublicId: "",
+    description: "",
+    categoryId: "",
+    secondaryImages: [
+      { imageUrl: "", imagePublicId: "" },
+      { imageUrl: "", imagePublicId: "" },
+      { imageUrl: "", imagePublicId: "" },
+    ],
+    specifications: {
+      model: "",
+      warranty: "",
+      delivery: "",
+    },
+  });
+
+  const handleAddProductSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    // Prepare payload ensuring numeric types match API requirements
+    const payload = {
+      ...productForm,
+      price: parseFloat(productForm.price),
+      stockQuantity: parseInt(productForm.stockQuantity),
+      imageUrl: productForm.imageUrl?.trim(),
+      imagePublicId: productForm.imageUrl?.split("/").pop()?.split(".")[0],
+      description: productForm.description,
+      categoryId: parseInt(productForm.categoryId),
+      // Secondary images handling (Filter out empty URLs, then map to extract public IDs)
+      secondaryImages: productForm.secondaryImages
+        .filter((img) => img.imageUrl?.trim() !== "")
+        .map((img) => {
+          const trimmedUrl = img.imageUrl.trim();
+          return {
+            imageUrl: trimmedUrl,
+            imagePublicId: trimmedUrl.split("/").pop()?.split(".")[0],
+          };
+        }),
+
+      // Nested specifications object
+      specifications: {
+        model: productForm.specifications.model?.trim(),
+        warranty: productForm.specifications.warranty?.trim(),
+        delivery: productForm.specifications.delivery?.trim(),
+      },
+    };
+
+    dispatch(addProduct(payload))
+      .unwrap()
+      .then(() => {
+        setShowProductModal(false);
+        // Reset form after successful submission
+        setProductForm({
+          name: "",
+          price: "",
+          stockQuantity: "",
+          imageUrl: "",
+          imagePublicId: "",
+          description: "",
+          categoryId: "",
+          secondaryImages: [
+            { imageUrl: "", imagePublicId: "" },
+            { imageUrl: "", imagePublicId: "" },
+            { imageUrl: "", imagePublicId: "" },
+          ],
+          specifications: {
+            model: "",
+            warranty: "",
+            delivery: "",
+          },
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to create product:", err);
+      });
+  };
 
   // --- New State for Viewing Product Details ---
   const [selectedProductToView, setSelectedProductToView] = useState<
@@ -554,7 +636,10 @@ export const AdminDashboardPage: React.FC = () => {
                         type="button"
                         className="btn btn-outline-primary btn-sm py-0 px-2"
                         // onClick={() => alert(`Edit User: ${usr.name}`)}
-                        onClick={() => { setSelectedUserToEdit(usr.id); setUpdatedRole(usr.role);}}
+                        onClick={() => {
+                          setSelectedUserToEdit(usr.id);
+                          setUpdatedRole(usr.role);
+                        }}
                       >
                         <i className="bi bi-pencil me-1"></i>[Edit]
                       </button>
@@ -1054,15 +1139,34 @@ export const AdminDashboardPage: React.FC = () => {
                   onClick={() => setShowProductModal(false)}
                 ></button>
               </div>
-              <div className="modal-body">
-                <form>
+              <form onSubmit={handleAddProductSubmit}>
+                <div className="modal-body">
                   <div className="mb-3">
                     <label className="col-form-label ">Product Name</label>
-                    <input type="text" className="form-control w-50" />
+                    <input
+                      type="text"
+                      className="form-control w-50"
+                      value={productForm.name}
+                      onChange={(e) =>
+                        setProductForm({ ...productForm, name: e.target.value })
+                      }
+                      required
+                    />
                   </div>
                   <div className="mb-3">
                     <label className="col-form-label ">Category</label>
-                    <select className="form-select w-50" defaultValue="">
+                    <select
+                      className="form-select w-50"
+                      defaultValue=""
+                      value={productForm.categoryId}
+                      onChange={(e) =>
+                        setProductForm({
+                          ...productForm,
+                          categoryId: e.target.value,
+                        })
+                      }
+                      required
+                    >
                       <option value="" disabled>
                         Select a Category
                       </option>
@@ -1073,24 +1177,53 @@ export const AdminDashboardPage: React.FC = () => {
                             {category.name}
                           </option>
                         ))}
-                      {/* <option value="1">Category One</option>
-                      <option value="2">Category Two</option>
-                      <option value="3">Category Three</option> */}
                     </select>
-                    {/* <input type="text" className="form-control w-50"/> */}
                   </div>
                   <div className="mb-3">
                     <label className="col-form-label ">Price</label>
-                    <input type="text" className="form-control w-50" />
+                    <input
+                      type="text"
+                      className="form-control w-50"
+                      value={productForm.price}
+                      onChange={(e) =>
+                        setProductForm({
+                          ...productForm,
+                          price: e.target.value,
+                        })
+                      }
+                      required
+                    />
                   </div>
                   <div className="mb-3">
                     <label className="col-form-label ">Stock Quantity</label>
-                    <input type="text" className="form-control w-50" />
+                    <input
+                      type="text"
+                      className="form-control w-50"
+                      value={productForm.stockQuantity}
+                      onChange={(e) =>
+                        setProductForm({
+                          ...productForm,
+                          stockQuantity: e.target.value,
+                        })
+                      }
+                      required
+                    />
                   </div>
 
                   <div className="mb-3">
                     <label className="col-form-label ">Description</label>
-                    <input type="text" className="form-control" />
+                    <textarea
+                      className="form-control"
+                      value={productForm.description}
+                      onChange={(e) =>
+                        setProductForm({
+                          ...productForm,
+                          description: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    {/* <input type="text" className="form-control" /> */}
                   </div>
 
                   {/* Specifications Section (Model, Warranty, Delivery) */}
@@ -1110,6 +1243,17 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter model"
+                          value={productForm.specifications.model}
+                          onChange={(e) =>
+                            setProductForm({
+                              ...productForm,
+                              specifications: {
+                                ...productForm.specifications,
+                                model: e.target.value,
+                              },
+                            })
+                          }
+                          required
                         />
                       </div>
 
@@ -1125,6 +1269,17 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter warranty details"
+                          value={productForm.specifications.warranty}
+                          onChange={(e) =>
+                            setProductForm({
+                              ...productForm,
+                              specifications: {
+                                ...productForm.specifications,
+                                warranty: e.target.value,
+                              },
+                            })
+                          }
+                          required
                         />
                       </div>
 
@@ -1140,33 +1295,82 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter delivery info"
+                          value={productForm.specifications.delivery}
+                          onChange={(e) =>
+                            setProductForm({
+                              ...productForm,
+                              specifications: {
+                                ...productForm.specifications,
+                                delivery: e.target.value,
+                              },
+                            })
+                          }
+                          required
                         />
                       </div>
                     </div>
                   </div>
-                  {/* <div className="mb-3">
-                    <label className="col-form-label ">Specifications</label>
-                    <input type="text" className="form-control" />
-                  </div> */}
-
-                  {/* <div className="mb-3">
-                    <label className="col-form-label ss">
-                      Secondary Images
-                    </label>
-                    <textarea rows={3} className="form-control" />
-                  </div> */}
 
                   <div className="mb-3">
                     <label className="col-form-label ">Primary Image URL</label>
-                    <input type="text" className="form-control" />
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={productForm.imageUrl}
+                      placeholder="Enter Primary Image URL"
+                      onChange={(e) =>
+                        setProductForm({
+                          ...productForm,
+                          imageUrl: e.target.value,
+                        })
+                      }
+                      required
+                    />
                   </div>
 
                   {/* Secondary Images Section (#1, #2, #3) */}
                   <div className="mb-3">
                     <label className="col-form-label">Secondary Images</label>
+                    <div className="ms-3">
+                      {[0, 1, 2].map((idx) => (
+                        <div
+                          className="d-flex align-items-center gap-2 mb-2"
+                          key={idx}
+                        >
+                          <label
+                            className="small text-muted"
+                            style={{ width: "160px" }}
+                          >
+                            Secondary Image #{idx + 1} URL:
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder={`Enter Secondary Image URL #${idx + 1}`}
+                            value={productForm.secondaryImages[idx]?.imageUrl}
+                            onChange={(e) => {
+                              const updated = [...productForm.secondaryImages];
+                              updated[idx] = {
+                                imageUrl: e.target.value,
+                                imagePublicId: "",
+                              };
+                              setProductForm({
+                                ...productForm,
+                                secondaryImages: updated,
+                              });
+                            }}
+                            required
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* <div className="mb-3">
+                    <label className="col-form-label">Secondary Images</label>
 
                     <div className="ms-3">
-                      {/* Secondary Image #1 */}
+  
                       <div className="d-flex align-items-center gap-2 mb-2">
                         <label
                           className="col-form-label small text-muted"
@@ -1178,10 +1382,11 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter secondary image #1 URL"
+                          required
                         />
                       </div>
 
-                      {/* Secondary Image #2 */}
+                      
                       <div className="d-flex align-items-center gap-2 mb-2">
                         <label
                           className="col-form-label small text-muted"
@@ -1193,10 +1398,11 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter secondary image #2 URL"
+                          required
                         />
                       </div>
 
-                      {/* Secondary Image #3 */}
+                      
                       <div className="d-flex align-items-center gap-2">
                         <label
                           className="col-form-label small text-muted"
@@ -1208,25 +1414,27 @@ export const AdminDashboardPage: React.FC = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter secondary image #3 URL"
+                          required
                         />
                       </div>
                     </div>
-                  </div>
-                </form>
-              </div>
+                  </div> */}
+                </div>
 
-              <div className="modal-footer">
-                <button type="button" className="btn btn-primary">
-                  Save Product
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </button>
-              </div>
+                <div className="modal-footer">
+                  <button type="submit" className="btn btn-primary" disabled={productLoading}>
+                    {productLoading ? "Saving..." : "Save Product"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    onClick={() => setShowProductModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -1460,19 +1668,21 @@ export const AdminDashboardPage: React.FC = () => {
                       //   alert(`Updated role for: ${user.name}`);
                       //   setSelectedUserToEdit(null);
                       // }}
-                      onClick = {async () => {
-                        try{
+                      onClick={async () => {
+                        try {
                           const roleToSend = updatedRole || user.role;
 
                           // Dispatch the async thunk
-                          await dispatch(updateUserRole({ id:user.id,role:roleToSend })).unwrap();
+                          await dispatch(
+                            updateUserRole({ id: user.id, role: roleToSend }),
+                          ).unwrap();
 
                           alert(`Sucessfully updated role for ${user.name}`);
                           setSelectedUserToEdit(null);
-                          setUpdatedRole("");// Reset state
-                        } catch(error){
+                          setUpdatedRole(""); // Reset state
+                        } catch (error) {
                           console.error("Error updating role:", error);
-                          alert("An error occured while updating the role")
+                          alert("An error occured while updating the role");
                         }
                       }}
                     >

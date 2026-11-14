@@ -39,6 +39,20 @@ export const fetchProducts = createAsyncThunk(
 );
 
 
+// 2. Add product async thunk (POST /api/Products)
+export const addProduct = createAsyncThunk(
+    'products/addProduct',
+    async(newProductData:any, { rejectWithValue }) =>{
+        try{
+            const response = await api.post<Product>('/products',newProductData);
+            return response.data; // Returns the newly created product from the backend
+        } catch( error: any){
+            return rejectWithValue(error.response?.data?.message || 'Failed to add product');
+        }
+    }
+);
+
+
 
 
 export const productSlice = createSlice({
@@ -70,7 +84,21 @@ export const productSlice = createSlice({
             .addCase(fetchProducts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string || 'An error occurred';
+            })
+            // Add Product Lifecycle
+            .addCase(addProduct.pending,(state) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(addProduct.fulfilled, (state,action) => {
+                state.loading = false;
+                state.products.push(action.payload);// Automatically update state with the new product
+            })
+            .addCase(addProduct.rejected,(state,action) => {
+                state.loading = false;
+                state.error = action.payload as string || 'Failed to add product'
             });
+
     },
 });
 
