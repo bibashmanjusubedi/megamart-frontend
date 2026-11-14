@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { updateOrderStatus } from "../store/slices/orderSlice";
-import { deleteProduct, addProduct } from "../store/slices/productSlice";
+import { deleteProduct, addProduct,deleteProductAsync } from "../store/slices/productSlice";
 import { logout } from "../store/slices/authSlice";
 import type { Order } from "../types";
 import { useEffect } from "react";
@@ -472,7 +472,7 @@ export const AdminDashboardPage: React.FC = () => {
                           className="btn btn-outline-danger btn-sm py-0 px-2"
                           onClick={() => {
                             if (window.confirm(`Delete "${prod.name}"?`)) {
-                              dispatch(deleteProduct(prod.id));
+                              dispatch(deleteProductAsync(prod.id));
                             }
                           }}
                         >
