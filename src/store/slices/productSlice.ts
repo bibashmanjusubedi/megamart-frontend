@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice,type PayloadAction } from '@reduxjs/toolkit';
 import type { Product } from '../../types';
-import type { Category } from '../../types';
-import { mockProducts } from '../../mock/mockData';
-import { mockCategories } from '../../mock/mockData';
+// import type { Category } from '../../types';
+// import { mockProducts } from '../../mock/mockData';
+// import { mockCategories } from '../../mock/mockData';
 import api from '../../services/api';
 
 interface ProductState {

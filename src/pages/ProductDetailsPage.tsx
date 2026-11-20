@@ -4,10 +4,10 @@ import { Header } from "../components/Header";
 import { CategoryNav } from "../components/CategoryNav";
 import { Footer } from "../components/Footer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { addToCart } from "../store/slices/cartSlice";
-import { addOrder } from "../store/slices/orderSlice";
+// import { addToCart } from "../store/slices/cartSlice";
+// import { addOrder } from "../store/slices/orderSlice";
 // import axios from "axios";
-import api from "../services/api";
+// import api from "../services/api";
 import { addToCartBackend } from "../store/slices/cartSlice";
 
 export const ProductDetailsPage: React.FC = () => {
@@ -22,7 +22,7 @@ export const ProductDetailsPage: React.FC = () => {
   const isAuthenticated = useAppSelector((state) => state.auth?.isAuthenticated);
 
   // Safely extract user ID checking common auth slice patterns (user.id, userId, or fallback to 1)
-  const currentUser = useAppSelector((state) => state.auth?.currentUser);
+  // const currentUser = useAppSelector((state) => state.auth?.currentUser);
   // const userId = currentUser?.id;
 
   // Find product and corresponding category
@@ -132,19 +132,19 @@ export const ProductDetailsPage: React.FC = () => {
       return;
     }
 
-    const generatedOrderId = Date.now();
+    // const generatedOrderId = Date.now();
 
     try{
       // 1. Send the expected DTO body to your backend API
-     const response = await api.post('/Orders', {
-        userId: currentUser!.id,
-        items: [
-          {
-            productId: product.id,
-            quantity: quantity
-          }
-        ]
-      });
+    //  const response = await api.post('/Orders', {
+    //     userId: currentUser!.id,
+    //     items: [
+    //       {
+    //         productId: product.id,
+    //         quantity: quantity
+    //       }
+    //     ]
+    //   });
 
       alert(`Proceeding to checkout with ${quantity}x "${product.name}"!`);
       navigate("/orders");

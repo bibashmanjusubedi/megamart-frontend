@@ -12,7 +12,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { CustomerOrderHistoryPage } from './pages/CustomerOrderHistoryPage';
 import React from 'react';
-import { BrowserRouter,Routes,Route} from 'react-router-dom';
+import { Routes,Route} from 'react-router-dom';
  
 const App: React.FC = () =>{
   return (

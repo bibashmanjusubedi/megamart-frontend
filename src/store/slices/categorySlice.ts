@@ -29,7 +29,7 @@
 
 import { createAsyncThunk, createSlice,type PayloadAction } from '@reduxjs/toolkit';
 import type { Category } from '../../types';
-import { mockCategories } from '../../mock/mockData';
+// import { mockCategories } from '../../mock/mockData';
 import api from '../../services/api';
 
 export const fetchCategories = createAsyncThunk(

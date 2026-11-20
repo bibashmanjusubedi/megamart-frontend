@@ -9,7 +9,6 @@ import {
   removeFromCart,
   setPaymentMethod,
   setDeliveryAddress,
-  clearCart,
   updateCartItemQuantity,
   removeCartItemFromApi,
   checkoutOrder

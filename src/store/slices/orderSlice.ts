@@ -1,4 +1,4 @@
-import { createSlice,createAsyncThunk, type PayloadAction, isRejectedWithValue } from '@reduxjs/toolkit';
+import { createSlice,createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { Order } from '../../types';
 // import axios from "axios";
 import api from "../../services/api";

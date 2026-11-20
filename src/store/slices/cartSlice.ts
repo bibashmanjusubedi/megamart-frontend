@@ -2,9 +2,8 @@ import {
   createSlice,
   createAsyncThunk,
   type PayloadAction,
-  isRejectedWithValue,
 } from "@reduxjs/toolkit";
-import type { Product, CartItem } from "../../types";
+import type { CartItem } from "../../types";
 import api from "../../services/api";
 
 interface CartState {
