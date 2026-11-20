@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Update this to match your backend's actual running URL (e.g., https://localhost:7231/api) for local Development and https://megamart-backend-uyt3.onrender.com/api for Production
-const API_BASE_URL = 'https://localhost:7231/api';
+const API_BASE_URL = 'https://megamart-backend-uyt3.onrender.com/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
