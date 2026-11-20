@@ -67,6 +67,22 @@ export const deleteProductAsync = createAsyncThunk(
 );
 
 
+// Add product update async thunk (PUT /api/Products/{id})
+export const updateProduct = createAsyncThunk(
+    'products/updateProduct',
+    async({ id, updatedData }: { id:number; updatedData:any }, { rejectWithValue }) => {
+        try{
+            // const response = await api.put<Product>(`/products/${id}`, updatedData);
+            // return response.data; //// or return { id, updatedData } depending on your backend
+            await api.put(`/products/${id}`, updatedData);
+            return { id, ...updatedData } as Product;
+        } catch (error: any){
+            return rejectWithValue(error.response?.data?.message || 'Failed to update product');
+        }
+    }
+)
+
+
 
 
 export const productSlice = createSlice({
@@ -122,6 +138,26 @@ export const productSlice = createSlice({
             })
             .addCase(deleteProductAsync.rejected, (state, action) => {
                 state.error = action.payload as string || 'Failed to delete product';
+            })
+            // Update Product Lifecycle
+            .addCase(updateProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateProduct.fulfilled, (state, action) => {
+                state.loading = false;
+                const index = state.products.findIndex((p) => p.id === action.payload.id);
+                if (index !== -1) {
+                    // state.products[index] = action.payload; // Update product in state
+                    state.products[index] = {
+                    ...state.products[index],
+                    ...action.payload,
+                };
+                }
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string || 'Failed to update product';
             });
 
     },

@@ -2,7 +2,11 @@ import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { updateOrderStatus } from "../store/slices/orderSlice";
-import { deleteProduct, addProduct,deleteProductAsync } from "../store/slices/productSlice";
+import {
+  addProduct,
+  deleteProductAsync,
+  updateProduct,
+} from "../store/slices/productSlice";
 import { logout } from "../store/slices/authSlice";
 import type { Order } from "../types";
 import { useEffect } from "react";
@@ -31,7 +35,9 @@ export const AdminDashboardPage: React.FC = () => {
   }, [dispatch]);
 
   const { orders } = useAppSelector((state) => state.orders);
-  const { products, loading:productLoading } = useAppSelector((state) => state.products);
+  const { products, loading: productLoading } = useAppSelector(
+    (state) => state.products,
+  );
   const { categories } = useAppSelector((state) => state.categories);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { users } = useAppSelector((state) => state.auth);
@@ -139,6 +145,87 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedProductToEdit, setSelectedProductToEdit] = useState<
     number | null
   >(null);
+
+  const [editFormData, setEditFormData] = useState<any>(null);
+
+  // Automatically populate form data whenever a product is selected to edit
+  useEffect(() => {
+    if (selectedProductToEdit !== null) {
+      const product = products.find((p) => p.id === selectedProductToEdit);
+      if (product) {
+        setEditFormData({
+          name: product.name || "",
+          price: product.price || 0,
+          stockQuantity: product.stockQuantity || 0,
+          imageUrl: product.imageUrl || "",
+          imagePublicId: product.imagePublicId || "",
+          description: product.description || "",
+          categoryId: product.categoryId || 0,
+          secondaryImages: (product.secondaryImages || []).map((img: any) => ({
+            imageUrl: typeof img === "string" ? img : img?.imageUrl || "",
+            imagePublicId:
+              typeof img === "object" ? img?.imagePublicId || "" : "",
+          })),
+          specifications: {
+            model: product.specifications?.model || "",
+            warranty: product.specifications?.warranty || "",
+            delivery: product.specifications?.delivery || "",
+          },
+        });
+      }
+    } else {
+      setEditFormData(null);
+    }
+  }, [selectedProductToEdit, products]);
+
+  const handleSaveChanges = async () => {
+    if (selectedProductToEdit === null || !editFormData) return;
+
+    const trimmedPrimaryUrl = editFormData.imageUrl?.trim() || "";
+
+    const payload = {
+      name: editFormData.name?.trim() || "",
+      price: parseFloat(editFormData.price) || 0,
+      stockQuantity: parseInt(editFormData.stockQuantity, 10) || 0,
+      imageUrl: trimmedPrimaryUrl,
+      imagePublicId:
+        editFormData.imagePublicId ||
+        trimmedPrimaryUrl.split("/").pop()?.split(".")[0] ||
+        "",
+      description: editFormData.description?.trim() || "",
+      categoryId: parseInt(editFormData.categoryId, 10) || 0,
+      secondaryImages: (editFormData.secondaryImages || [])
+        .filter((img: any) => img?.imageUrl?.trim() !== "")
+        .map((img: any) => {
+          const trimmedUrl = img.imageUrl.trim();
+          return {
+            imageUrl: trimmedUrl,
+            imagePublicId:
+              img.imagePublicId ||
+              trimmedUrl.split("/").pop()?.split(".")[0] ||
+              "",
+          };
+        }),
+      specifications: {
+        model: editFormData.specifications?.model?.trim() || "",
+        warranty: editFormData.specifications?.warranty?.trim() || "",
+        delivery: editFormData.specifications?.delivery?.trim() || "",
+      },
+    };
+
+    try {
+      await dispatch(
+        updateProduct({ id: selectedProductToEdit, updatedData: payload })
+      ).unwrap();
+
+      alert(`Successfully updated: ${payload.name}`);
+      setSelectedProductToEdit(null);
+      setEditFormData(null);
+    } catch (err: any) {
+      alert(`Failed to update product: ${err || "Unknown error"}`);
+      console.error("Failed to update product:", err);
+    }
+  };
 
   const [selectedCategoryToEdit, setSelectedCategoryToEdit] = useState<
     number | null
@@ -875,13 +962,15 @@ export const AdminDashboardPage: React.FC = () => {
           );
         })()}
 
-      {selectedProductToEdit !== null &&
-        (() => {
-          const product = products.find((p) => p.id === selectedProductToEdit);
+      {selectedProductToEdit !== null && editFormData !==null && (
+        // (() => {
+          // const product = products.find((p) => p.id === selectedProductToEdit);
 
-          if (!product) return null;
+          // if (!product) return null;
 
-          return (
+
+
+          // return (
             <div
               className="modal show d-block"
               tabIndex={-1}
@@ -899,13 +988,31 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
 
                   <div className="modal-body">
-                    <form>
+                    <form
+                        onSubmit={async (e) => {
+                        e.preventDefault();
+                        const resultAction = await dispatch(
+                          updateProduct({ id: selectedProductToEdit, updatedData: editFormData }) as any
+                        );
+
+                        if (updateProduct.fulfilled.match(resultAction)) {
+                          alert(`Successfully updated: ${editFormData.name}`);
+                          setSelectedProductToEdit(null);
+                        } else {
+                          alert(`Failed to update product: ${resultAction.payload}`);
+                        }
+                      }}
+                    >
                       <div className="mb-3">
                         <label className="col-form-label">Product Name</label>
                         <input
                           type="text"
                           className="form-control w-50"
-                          defaultValue={product.name}
+                          // defaultValue={product.name}
+                          value = {editFormData.name}
+                          onChange = {(e) => 
+                            setEditFormData({...editFormData, name:e.target.value})
+                          }
                         />
                       </div>
 
@@ -913,7 +1020,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <label className="col-form-label">Category</label>
                         <select
                           className="form-select w-50"
-                          defaultValue={product.categoryId}
+                          // defaultValue={product.categoryId}
+                          value = {editFormData.categoryId}
+                          onChange={(e) =>
+                            setEditFormData((prev: any) => ({
+                              ...prev,
+                              categoryId: Number(e.target.value),
+                            }))
+                          }
                         >
                           <option value="" disabled>
                             Select a Category
@@ -931,7 +1045,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <input
                           type="text"
                           className="form-control w-50"
-                          defaultValue={product.price}
+                          // defaultValue={product.price}
+                          value = {editFormData.price}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              price: e.target.value === "" ? 0 : parseFloat(e.target.value),
+                            })
+                          }
                         />
                       </div>
 
@@ -940,7 +1061,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <input
                           type="text"
                           className="form-control w-50"
-                          defaultValue={product.stockQuantity}
+                          // defaultValue={product.stockQuantity}
+                          value={editFormData.stockQuantity}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              stockQuantity: e.target.value === "" ? 0 : Number(e.target.value),
+                            })
+                          }
                         />
                       </div>
 
@@ -949,7 +1077,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <input
                           type="text"
                           className="form-control"
-                          defaultValue={product.description}
+                          // defaultValue={product.description}
+                          value={editFormData.description}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              description: e.target.value,
+                            })
+                          }
                         />
                       </div>
 
@@ -966,7 +1101,17 @@ export const AdminDashboardPage: React.FC = () => {
                             <input
                               type="text"
                               className="form-control"
-                              defaultValue={product.specifications.model}
+                              // defaultValue={product.specifications.model}
+                              value={editFormData.specifications.model}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  specifications: {
+                                    ...editFormData.specifications,
+                                    model: e.target.value,
+                                  },
+                                })
+                              }
                             />
                           </div>
                           <div className="mb-2 d-flex align-items-center gap-2">
@@ -979,7 +1124,17 @@ export const AdminDashboardPage: React.FC = () => {
                             <input
                               type="text"
                               className="form-control"
-                              defaultValue={product.specifications.warranty}
+                              // defaultValue={product.specifications.warranty}
+                              value={editFormData.specifications.warranty}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  specifications: {
+                                    ...editFormData.specifications,
+                                    warranty: e.target.value,
+                                  },
+                                })
+                              }
                             />
                           </div>
 
@@ -993,7 +1148,17 @@ export const AdminDashboardPage: React.FC = () => {
                             <input
                               type="text"
                               className="form-control"
-                              defaultValue={product.specifications.delivery}
+                              // defaultValue={product.specifications.delivery}
+                              value={editFormData.specifications.delivery}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  specifications: {
+                                    ...editFormData.specifications,
+                                    delivery: e.target.value,
+                                  },
+                                })
+                              }
                             />
                           </div>
                         </div>
@@ -1004,10 +1169,12 @@ export const AdminDashboardPage: React.FC = () => {
                         <label className="col-form-label">Primary Image</label>
 
                         <div className="text-center">
-                          {product.imageUrl ? (
+                          {/*product.imageUrl*/editFormData.imageUrl ? (
                             <img
-                              src={product.imageUrl}
-                              alt={product.name}
+                              // src={product.imageUrl}
+                              src = {editFormData.imageUrl}
+                              // alt={product.name}
+                              alt = { editFormData.name}
                               style={{
                                 maxHeight: "300px",
                                 objectFit: "cover",
@@ -1030,8 +1197,15 @@ export const AdminDashboardPage: React.FC = () => {
                           <input
                             type="text"
                             className="form-control mt-2"
-                            defaultValue={product.imageUrl}
+                            // defaultValue={product.imageUrl}
+                            value={editFormData.imageUrl}
                             placeholder="Update Primary Image URL"
+                            onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              imageUrl: e.target.value,
+                            })
+                          }
                           />
                         </div>
                       </div>
@@ -1042,10 +1216,10 @@ export const AdminDashboardPage: React.FC = () => {
                           Secondary Images
                         </label>
                         <div>
-                          {product.secondaryImages &&
-                          product.secondaryImages.length > 0 ? (
+                          {/*product.secondaryImages*/  editFormData.secondaryImages &&
+                          /*product.secondaryImages.length > 0*/ editFormData.secondaryImages.length > 0  ? (
                             <div className="d-flex flex-column gap-3 mb-2">
-                              {product.secondaryImages.map(
+                              {/*product.secondaryImages/*/editFormData.secondaryImages.map(
                                 (secondaryImage: any, index: number) => {
                                   const imgUrl =
                                     typeof secondaryImage === "string"
@@ -1060,7 +1234,8 @@ export const AdminDashboardPage: React.FC = () => {
                                       {/* Thumbnail Preview */}
                                       <img
                                         src={imgUrl}
-                                        alt={`${product.name} Secondary ${index + 1}`}
+                                        // alt={`${product.name} Secondary ${index + 1}`}
+                                        alt={`${editFormData.name} Secondary ${index + 1}`}
                                         className="flex-shrink-0"
                                         style={{
                                           width: "100px",
@@ -1077,8 +1252,21 @@ export const AdminDashboardPage: React.FC = () => {
                                         <input
                                           type="text"
                                           className="form-control form-control-sm"
-                                          defaultValue={imgUrl || ""}
+                                          // defaultValue={imgUrl || ""}
+                                          value={secondaryImage.imageUrl || ""}
                                           placeholder="Enter secondary image URL"
+                                          onChange={(e) => {
+                                            const updated = [...editFormData.secondaryImages];
+                                            updated[index] = {
+                                              ...updated[index],
+                                              imageUrl: e.target.value,
+                                            };
+                                            setEditFormData({
+                                              ...editFormData,
+                                              secondaryImages: updated,
+                                            });
+                                          }}
+
                                         />
                                       </div>
                                     </div>
@@ -1100,17 +1288,19 @@ export const AdminDashboardPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-primary"
-                      onClick={() => {
-                        alert(`Updated changes for: ${product.name}`);
-                        setSelectedProductToEdit(null);
-                      }}
+                      // onClick={() => {
+                      //   alert(`Updated changes for: ${product.name}`);
+                      //   setSelectedProductToEdit(null);
+                      // }}
+                      disabled={productLoading}
+                      onClick={handleSaveChanges}
                     >
-                      Save Changes
+                      {productLoading ? "Saving..." : "Save Changes"}
                     </button>
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={() => setSelectedProductToEdit(null)}
+                      onClick={() => {setSelectedProductToEdit(null);setEditFormData(null);}}
                     >
                       Cancel
                     </button>
@@ -1118,8 +1308,13 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          );
-        })()}
+
+        )}
+
+
+      
+        {/*   );
+         })()}*/}
 
       {/* ===================== MODALS ===================== */}
       {/* 1. Add New Product Modal */}
@@ -1422,7 +1617,11 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <div className="modal-footer">
-                  <button type="submit" className="btn btn-primary" disabled={productLoading}>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={productLoading}
+                  >
                     {productLoading ? "Saving..." : "Save Product"}
                   </button>
                   <button
